@@ -16,27 +16,25 @@
 	/**
 	 * Reads the WS Form field label associated with a gaitcha container.
 	 *
-	 * WS Form renders a <label> before the field wrapper. The container's
-	 * id matches the label's "for" attribute.
+	 * WS Form renders a `<label for="#id">` via mask_field_label. The label's
+	 * "for" attribute matches the container's id.
 	 *
 	 * @param {HTMLElement} container The gaitcha container element.
 	 * @return {string} The label text, or the default label.
 	 */
 	function readFieldLabel(container) {
 		var fieldId = container.id;
-		if (!fieldId) {
-			return config.defaultLabel || '';
+		if (fieldId) {
+			var wrapper = container.closest('.wsf-field-wrapper') || container.closest('form');
+			if (wrapper) {
+				var label = wrapper.querySelector('label[for="' + fieldId + '"]');
+				if (label && label.textContent.trim()) {
+					return { text: label.textContent.trim(), element: label };
+				}
+			}
 		}
 
-		var label = container.closest('form')
-			? container.closest('form').querySelector('label[for="' + fieldId + '"]')
-			: null;
-
-		if (label && label.textContent.trim()) {
-			return label.textContent.trim();
-		}
-
-		return config.defaultLabel || '';
+		return { text: config.defaultLabel || '', element: null };
 	}
 
 	/**
@@ -56,11 +54,16 @@
 		}
 
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
-		var label = readFieldLabel(container);
+		var labelData = readFieldLabel(container);
 		Gaitcha.init(form, config.endpoint, {
-			label: label,
+			label: labelData.text,
 			container: container
 		});
+
+		// Hide the WS Form label to avoid duplication with the gaitcha checkbox label.
+		if (labelData.element) {
+			labelData.element.style.display = 'none';
+		}
 	}
 
 	/**

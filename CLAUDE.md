@@ -11,13 +11,13 @@ gaitcha-for-wp/
 ├── assets/js/
 │   ├── gaitcha.min.js              # Core JS (build depuis gaitcha)
 │   └── gaitcha-wsform.js           # Adapter JS pour WS Form
-└── includes/
-    ├── class-plugin.php            # Orchestrateur (Config, Endpoint, Connectors)
-    ├── class-endpoint.php          # REST POST /wp-json/gaitcha/v1/init
-    ├── class-updater.php           # Auto-update via GitHub Releases
-    └── connectors/
-        ├── class-connector-interface.php   # Interface: register_hooks()
-        └── class-wsform-connector.php      # WS Form: enqueue + validation
+└── includes/                       # PSR-4: GaitchaWP\ (fichiers nommes par classe)
+    ├── Plugin.php                  # Orchestrateur (Config, Endpoint, Connectors)
+    ├── Endpoint.php                # REST POST /wp-json/gaitcha/v1/init
+    ├── Updater.php                 # Auto-update via GitHub Releases
+    └── connectors/                 # PSR-4: GaitchaWP\Connectors\
+        ├── ConnectorInterface.php  # Interface: register_hooks()
+        └── WSFormConnector.php     # WS Form: field type + enqueue + validation
 ```
 
 ## Namespace & Autoload

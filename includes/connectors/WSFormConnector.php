@@ -77,7 +77,9 @@ class WSFormConnector implements ConnectorInterface {
 		$gaitcha_field = array(
 			'label'                => 'Gaitcha',
 			'label_default'        => 'Gaitcha',
-			'mask_field'           => '<div id="#id" data-gaitcha-container="#id"#attributes></div>',
+			'mask_field'                => '#pre_label<div id="#id" data-gaitcha-container="#id"#attributes></div>#post_label',
+			'mask_field_label'          => '<label id="#label_id" for="#id"#attributes>#label</label>',
+			'mask_field_label_attributes' => array( 'class' ),
 			'mask_field_attributes' => array( 'class' ),
 			'submit_save'          => false,
 			'submit_edit'          => false,
@@ -136,12 +138,13 @@ class WSFormConnector implements ConnectorInterface {
 	/**
 	 * Enqueues Gaitcha core and WS Form adapter scripts.
 	 *
-	 * Only loads when WS Form public script is registered.
+	 * Loaded on all front-end pages when WS Form is active.
+	 * The JS adapter is a no-op if no [data-gaitcha-container] is found.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		if ( ! wp_script_is( 'wsf-public', 'registered' ) ) {
+		if ( is_admin() ) {
 			return;
 		}
 
