@@ -60,13 +60,13 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 	 * @return void
 	 */
 	public function field_preview( $field ) {
-		$this->field_preview_option( 'label', $field );
+		$label = ! empty( $field['label'] ) ? $field['label'] : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
 
-		echo '<ul class="primary-input"><li class="choice-0 depth-1">';
-		echo '<input type="checkbox" disabled>';
-		echo '<label class="wpforms-field-label-inline">';
-		echo esc_html( ! empty( $field['label'] ) ? $field['label'] : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ) );
-		echo '</label></li></ul>';
+		echo '<div class="primary-input" style="padding:8px 0;">';
+		echo '<input type="checkbox" disabled style="margin-right:4px;vertical-align:middle;">';
+		echo '<label class="wpforms-field-label-inline" style="vertical-align:middle;">';
+		echo esc_html( $label );
+		echo '</label></div>';
 
 		$this->field_preview_option( 'description', $field );
 	}
