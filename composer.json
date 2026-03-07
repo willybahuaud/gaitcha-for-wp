@@ -1,0 +1,15 @@
+{
+    "name": "wabeo/gaitcha-for-wp",
+    "description": "Gaitcha captcha integration for WordPress",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=7.4",
+        "wabeo/gaitcha": "^0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "GaitchaWP\\": "includes/"
+        }
+    }
+}
