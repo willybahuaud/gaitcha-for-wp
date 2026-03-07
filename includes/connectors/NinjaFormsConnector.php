@@ -85,10 +85,10 @@ class NinjaFormsConnector implements ConnectorInterface {
 	public function output_template() {
 		?>
 		<script id="tmpl-nf-field-gaitcha" type="text/template">
-			<div id="nf-gaitcha-{{{ data.id }}}"
+			<div id="nf-gaitcha-{{ data.id }}"
 				class="nf-gaitcha-container"
-				data-gaitcha-container="nf-gaitcha-{{{ data.id }}}"
-				data-gaitcha-label="{{{ data.label }}}">
+				data-gaitcha-container="nf-gaitcha-{{ data.id }}"
+				data-gaitcha-label="{{ data.label }}">
 			</div>
 		</script>
 		<?php

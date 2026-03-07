@@ -27,7 +27,7 @@
 		if (fieldId) {
 			var wrapper = container.closest('.wsf-field-wrapper') || container.closest('form');
 			if (wrapper) {
-				var label = wrapper.querySelector('label[for="' + fieldId + '"]');
+				var label = wrapper.querySelector('label[for="' + CSS.escape(fieldId) + '"]');
 				if (label && label.textContent.trim()) {
 					return { text: label.textContent.trim(), element: label };
 				}
