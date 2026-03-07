@@ -58,6 +58,7 @@ class CF7Connector implements ConnectorInterface {
 	 */
 	public function register_hooks(): void {
 		add_action( 'wpcf7_init', array( $this, 'register_form_tag' ) );
+		add_action( 'wpcf7_admin_init', array( $this, 'register_tag_generator' ), 60, 0 );
 		add_action( 'wpcf7_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_filter( 'wpcf7_spam', array( $this, 'verify_submission' ), 9, 2 );
 	}
@@ -135,6 +136,79 @@ class CF7Connector implements ConnectorInterface {
 	}
 
 	/**
+	 * Registers the tag generator button in the CF7 admin editor toolbar.
+	 *
+	 * @return void
+	 */
+	public function register_tag_generator() {
+		$tag_generator = \WPCF7_TagGenerator::get_instance();
+
+		$tag_generator->add(
+			self::TAG_NAME,
+			__( 'gaitcha', 'gaitcha-for-wp' ),
+			array( $this, 'render_tag_generator_panel' ),
+			array( 'version' => '2' )
+		);
+	}
+
+	/**
+	 * Renders the tag generator panel content.
+	 *
+	 * @param \WPCF7_ContactForm $contact_form CF7 form object.
+	 * @param array              $options       Tag generator options.
+	 * @return void
+	 */
+	public function render_tag_generator_panel( $contact_form, $options ) {
+		$tgg = new \WPCF7_TagGeneratorGenerator( $options['content'] );
+
+		$formatter = new \WPCF7_HTMLFormatter();
+
+		$formatter->append_start_tag( 'header', array(
+			'class' => 'description-box',
+		) );
+
+		$formatter->append_start_tag( 'h3' );
+		$formatter->append_preformatted(
+			esc_html__( 'Gaitcha form-tag generator', 'gaitcha-for-wp' )
+		);
+		$formatter->end_tag( 'h3' );
+
+		$formatter->append_start_tag( 'p' );
+		$formatter->append_preformatted(
+			esc_html__( 'Generates a form-tag for the Gaitcha captcha checkbox.', 'gaitcha-for-wp' )
+		);
+		$formatter->end_tag( 'header' );
+
+		$formatter->append_start_tag( 'div', array(
+			'class' => 'control-box',
+		) );
+
+		$formatter->call_user_func( static function () use ( $tgg ) {
+			$tgg->print( 'field_type', array(
+				'select_options' => array(
+					'gaitcha' => __( 'Gaitcha', 'gaitcha-for-wp' ),
+				),
+			) );
+
+			$tgg->print( 'default_value', array(
+				'title' => __( 'Label', 'contact-form-7' ),
+			) );
+		} );
+
+		$formatter->end_tag( 'div' );
+
+		$formatter->append_start_tag( 'footer', array(
+			'class' => 'insert-box',
+		) );
+
+		$formatter->call_user_func( static function () use ( $tgg ) {
+			$tgg->print( 'insert_box_content' );
+		} );
+
+		$formatter->print();
+	}
+
+	/**
 	 * Verifies the submission against Gaitcha.
 	 *
 	 * Only runs if the form contains a [gaitcha] tag.
@@ -162,7 +236,7 @@ class CF7Connector implements ConnectorInterface {
 
 		$orchestrator = new ValidationOrchestrator( $this->config );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Gaitcha uses HMAC token validation, not nonces.
-		$result       = $orchestrator->validate( $_POST );
+		$result       = $orchestrator->validate( wp_unslash( $_POST ) );
 
 		if ( ! $result->isAccepted() ) {
 			$submission->add_spam_log( array(

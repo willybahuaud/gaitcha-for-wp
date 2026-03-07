@@ -76,4 +76,7 @@
 	} else {
 		scanContainers();
 	}
+
+	// Re-scan after CF7 AJAX submission (CF7 replaces form HTML, new containers appear).
+	document.addEventListener('wpcf7submit', scanContainers);
 })();
