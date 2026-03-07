@@ -77,7 +77,7 @@
 	 * @return {void}
 	 */
 	function scanContainers() {
-		var containers = document.querySelectorAll('[data-gaitcha-container]');
+		var containers = document.querySelectorAll('.wsf-gaitcha-container[data-gaitcha-container]');
 
 		containers.forEach(function forEachContainer(container) {
 			initOnContainer(container);
@@ -95,7 +95,7 @@
 		if (formObject && formObject.form_canvas_obj) {
 			var formEl = formObject.form_canvas_obj.closest('form');
 			if (formEl) {
-				var containers = formEl.querySelectorAll('[data-gaitcha-container]');
+				var containers = formEl.querySelectorAll('.wsf-gaitcha-container[data-gaitcha-container]');
 				containers.forEach(function forEachContainer(container) {
 					initOnContainer(container);
 				});

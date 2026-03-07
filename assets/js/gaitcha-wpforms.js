@@ -62,7 +62,7 @@
 	 * @return {void}
 	 */
 	function scanContainers() {
-		var containers = document.querySelectorAll('.wpforms-field-gaitcha [data-gaitcha-container]');
+		var containers = document.querySelectorAll('.wpforms-gaitcha-container[data-gaitcha-container]');
 
 		containers.forEach(function forEachContainer(container) {
 			initOnContainer(container);

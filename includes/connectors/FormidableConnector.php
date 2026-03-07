@@ -153,7 +153,7 @@ class FormidableConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'I am not a robot', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
 			)
 		);
 

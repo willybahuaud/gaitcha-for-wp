@@ -29,6 +29,11 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 		$this->icon     = 'fa-check-square-o';
 		$this->order    = 200;
 		$this->group    = 'standard';
+
+		$this->default_settings = array(
+			'label'      => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+			'label_hide' => '1',
+		);
 	}
 
 	/**
@@ -60,7 +65,7 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 		echo '<ul class="primary-input"><li class="choice-0 depth-1">';
 		echo '<input type="checkbox" disabled>';
 		echo '<label class="wpforms-field-label-inline">';
-		echo esc_html( ! empty( $field['label'] ) ? $field['label'] : 'Gaitcha' );
+		echo esc_html( ! empty( $field['label'] ) ? $field['label'] : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ) );
 		echo '</label></li></ul>';
 
 		$this->field_preview_option( 'description', $field );
@@ -85,7 +90,7 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 		$container_id = 'wpforms-gaitcha-' . $form_id . '-' . $field_id;
 
 		printf(
-			'<ul class="wpforms-field-gaitcha"><li class="choice-0 depth-1" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></li></ul>',
+			'<div class="wpforms-gaitcha-container" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div>',
 			esc_attr( $container_id ),
 			esc_attr( $container_id ),
 			esc_attr( $label )

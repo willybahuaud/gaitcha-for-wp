@@ -92,10 +92,10 @@ class FrmFieldGaitcha extends \FrmFieldType {
 	public function front_field_input( $args, $shortcode_atts ) {
 		$field_id = 'frm-gaitcha-' . absint( $this->get_field_column( 'id' ) );
 		$name     = $this->get_field_column( 'name' );
-		$label    = ! empty( $name ) && 'Gaitcha' !== $name ? $name : '';
+		$label    = ! empty( $name ) && 'Gaitcha' !== $name ? $name : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
 
 		return sprintf(
-			'<div class="frm_opt_container"><div id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div></div>',
+			'<div class="frm_opt_container"><div class="frm-gaitcha-container" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div></div>',
 			esc_attr( $field_id ),
 			esc_attr( $field_id ),
 			esc_attr( $label )

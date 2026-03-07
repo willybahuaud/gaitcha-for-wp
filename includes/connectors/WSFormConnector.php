@@ -77,7 +77,7 @@ class WSFormConnector implements ConnectorInterface {
 		$gaitcha_field = array(
 			'label'                => 'Gaitcha',
 			'label_default'        => 'Gaitcha',
-			'mask_field'                => '#pre_label<div id="#id" data-gaitcha-container="#id"#attributes></div>#post_label',
+			'mask_field'                => '#pre_label<div id="#id" class="wsf-gaitcha-container" data-gaitcha-container="#id"#attributes></div>#post_label',
 			'mask_field_label'          => '<label id="#label_id" for="#id"#attributes>#label</label>',
 			'mask_field_label_attributes' => array( 'class' ),
 			'mask_field_attributes' => array( 'class' ),
@@ -169,7 +169,7 @@ class WSFormConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'I am not a robot', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
 			)
 		);
 	}

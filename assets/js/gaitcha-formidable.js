@@ -63,7 +63,7 @@
 	 * @return {void}
 	 */
 	function scanContainers() {
-		var containers = document.querySelectorAll('[data-gaitcha-container]');
+		var containers = document.querySelectorAll('.frm-gaitcha-container[data-gaitcha-container]');
 
 		containers.forEach(function forEachContainer(container) {
 			initOnContainer(container);
