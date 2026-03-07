@@ -180,11 +180,11 @@ class WSFormConnector implements ConnectorInterface {
 	 * Only runs if the form contains a Gaitcha field.
 	 *
 	 * @param array  $error_validation_actions Existing validation errors.
-	 * @param object $submit                   WS Form submit object.
 	 * @param string $post_mode                Submit mode ('save', 'submit', etc.).
+	 * @param object $submit                   WS Form submit object.
 	 * @return array Modified validation errors.
 	 */
-	public function validate_submission( $error_validation_actions, $submit, $post_mode ) {
+	public function validate_submission( $error_validation_actions, $post_mode, $submit ) {
 		if ( 'save' === $post_mode ) {
 			return $error_validation_actions;
 		}
