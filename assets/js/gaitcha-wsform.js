@@ -57,7 +57,12 @@
 		var labelData = readFieldLabel(container);
 		Gaitcha.init(form, config.endpoint, {
 			label: labelData.text,
-			container: container
+			container: container,
+			classes: {
+				field: 'gaitcha-field',
+				checkbox: 'gaitcha-checkbox wsf-field',
+				label: 'gaitcha-label wsf-label'
+			}
 		});
 
 		// Hide the WS Form label to avoid duplication with the gaitcha checkbox label.
