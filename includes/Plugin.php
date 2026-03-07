@@ -13,6 +13,11 @@ namespace GaitchaWP;
 use Gaitcha\Config;
 use GaitchaWP\Connectors\WSFormConnector;
 use GaitchaWP\Connectors\CF7Connector;
+use GaitchaWP\Connectors\FormidableConnector;
+use GaitchaWP\Connectors\GravityFormsConnector;
+use GaitchaWP\Connectors\WPFormsConnector;
+use GaitchaWP\Connectors\FluentFormsConnector;
+use GaitchaWP\Connectors\NinjaFormsConnector;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -69,6 +74,36 @@ class Plugin {
 		// Contact Form 7 connector.
 		if ( class_exists( 'WPCF7' ) ) {
 			$connector = new CF7Connector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Formidable Forms connector.
+		if ( class_exists( 'FrmAppHelper' ) ) {
+			$connector = new FormidableConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Gravity Forms connector.
+		if ( class_exists( 'GFForms' ) ) {
+			$connector = new GravityFormsConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// WPForms connector.
+		if ( function_exists( 'wpforms' ) ) {
+			$connector = new WPFormsConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Fluent Forms connector.
+		if ( defined( 'FLUENTFORM' ) ) {
+			$connector = new FluentFormsConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Ninja Forms connector.
+		if ( class_exists( 'Ninja_Forms' ) ) {
+			$connector = new NinjaFormsConnector( $this->config, $this->endpoint );
 			$connector->register_hooks();
 		}
 
