@@ -38,8 +38,8 @@ gaitcha-for-wp/
 
 ### Filtres
 - `gaitcha_config` — Modifier les options Config (secret, debug, ttl...)
-- `gaitcha_enabled_for_form` — Desactiver par form_id (bool)
 - `gaitcha_bypass_admin` — Bypass pour admins (defaut: manage_options)
+- `wsf_config_field_types` — Enregistre le field type "gaitcha" dans WS Form
 
 ## Flux d'integration Gaitcha
 
@@ -78,7 +78,19 @@ Classes cles utilisees :
 ## WS Form Pro
 
 Le code source de reference est dans `/Users/willy/Downloads/alpha/plugins/ws-form-pro/includes`.
-Hooks WS Form utilises :
-- `wsf_submit_validate` — Filtre de validation au submit
+
+### Approche field type
+Gaitcha s'integre comme un **field type custom** dans WS Form (groupe "Spam Protection").
+L'utilisateur drag & drop le champ "Gaitcha" dans son formulaire — seuls les forms
+qui contiennent ce champ sont proteges. Le label est celui du champ WS Form (editable
+dans le builder).
+
+### Hooks WS Form utilises
+- `wsf_config_field_types` — Enregistre le field type "gaitcha"
+- `wsf_submit_validate` — Valide les submissions (verifie si le form a un champ gaitcha)
 - `wsf-rendered` — Event jQuery pour les forms dynamiques (AJAX/popups)
 - `wsf-public` — Script handle pour conditionner l'enqueue
+
+### Rendu HTML du champ
+`<div id="wsf-X-Y" data-gaitcha-container="wsf-X-Y"></div>`
+Le JS adapter detecte `[data-gaitcha-container]` et y injecte la checkbox gaitcha.

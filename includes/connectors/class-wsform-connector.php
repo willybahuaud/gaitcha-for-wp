@@ -2,8 +2,8 @@
 /**
  * WS Form connector.
  *
- * Enqueues Gaitcha scripts on pages with WS Form and validates
- * submissions via the wsf_submit_validate filter.
+ * Registers a "Gaitcha" field type in WS Form's Spam Protection group,
+ * enqueues scripts, and validates submissions.
  *
  * @package GaitchaWP\Connectors
  */
@@ -20,6 +20,13 @@ defined( 'ABSPATH' ) || exit;
  * Class WSFormConnector
  */
 class WSFormConnector implements ConnectorInterface {
+
+	/**
+	 * WS Form field type identifier.
+	 *
+	 * @var string
+	 */
+	const FIELD_TYPE = 'gaitcha';
 
 	/**
 	 * Gaitcha configuration.
@@ -45,13 +52,85 @@ class WSFormConnector implements ConnectorInterface {
 	}
 
 	/**
-	 * Registers WordPress hooks for script enqueue and submit validation.
+	 * Registers WordPress hooks.
 	 *
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		add_filter( 'wsf_config_field_types', array( $this, 'register_field_type' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_filter( 'wsf_submit_validate', array( $this, 'validate_submission' ), 10, 3 );
+	}
+
+	/**
+	 * Registers the Gaitcha field type in WS Form.
+	 *
+	 * Adds Gaitcha to the "Spam Protection" group alongside reCAPTCHA, hCaptcha, and Turnstile.
+	 *
+	 * @param array $field_types Existing field types grouped by category.
+	 * @return array Modified field types.
+	 */
+	public function register_field_type( $field_types ) {
+		// Find the "Spam Protection" group key (the one containing recaptcha).
+		$spam_group_key = $this->find_spam_group_key( $field_types );
+
+		$gaitcha_field = array(
+			'label'                => 'Gaitcha',
+			'label_default'        => 'Gaitcha',
+			'mask_field'           => '<div id="#id" data-gaitcha-container="#id"#attributes></div>',
+			'mask_field_attributes' => array( 'class' ),
+			'submit_save'          => false,
+			'submit_edit'          => false,
+			'calc_in'              => false,
+			'calc_out'             => false,
+			'text_in'              => false,
+			'text_out'             => false,
+			'value_out'            => false,
+			'mappable'             => false,
+			'has_required'         => false,
+			'progress'             => false,
+			'keyword'              => __( 'captcha spam gaitcha behavioral', 'gaitcha-for-wp' ),
+			'multiple'             => false,
+			'icon'                 => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>',
+			'fieldsets'            => array(
+				'basic' => array(
+					'label'    => __( 'Basic', 'gaitcha-for-wp' ),
+					'meta_keys' => array( 'label_render', 'help' ),
+				),
+				'advanced' => array(
+					'label'     => __( 'Advanced', 'gaitcha-for-wp' ),
+					'fieldsets' => array(
+						array(
+							'label'    => __( 'Style', 'gaitcha-for-wp' ),
+							'meta_keys' => array( 'class_single_vertical_align' ),
+						),
+						array(
+							'label'    => __( 'Classes', 'gaitcha-for-wp' ),
+							'meta_keys' => array( 'class_field_wrapper' ),
+						),
+						array(
+							'label'    => __( 'Breakpoints', 'gaitcha-for-wp' ),
+							'meta_keys' => array( 'breakpoint_sizes' ),
+							'class'    => array( 'wsf-fieldset-panel' ),
+						),
+					),
+				),
+			),
+		);
+
+		if ( null !== $spam_group_key ) {
+			$field_types[ $spam_group_key ]['types'][ self::FIELD_TYPE ] = $gaitcha_field;
+		} else {
+			// Fallback: create a dedicated group.
+			$field_types['gaitcha'] = array(
+				'label' => __( 'Spam Protection', 'gaitcha-for-wp' ),
+				'types' => array(
+					self::FIELD_TYPE => $gaitcha_field,
+				),
+			);
+		}
+
+		return $field_types;
 	}
 
 	/**
@@ -86,8 +165,8 @@ class WSFormConnector implements ConnectorInterface {
 			'gaitcha-wsform',
 			'gaitchaWPConfig',
 			array(
-				'endpoint' => $this->endpoint->get_url(),
-				'label'    => __( 'I am not a robot', 'gaitcha-for-wp' ),
+				'endpoint'     => $this->endpoint->get_url(),
+				'defaultLabel' => __( 'I am not a robot', 'gaitcha-for-wp' ),
 			)
 		);
 	}
@@ -95,21 +174,19 @@ class WSFormConnector implements ConnectorInterface {
 	/**
 	 * Validates a WS Form submission against Gaitcha.
 	 *
+	 * Only runs if the form contains a Gaitcha field.
+	 *
 	 * @param array  $error_validation_actions Existing validation errors.
 	 * @param object $submit                   WS Form submit object.
 	 * @param string $post_mode                Submit mode ('save', 'submit', etc.).
 	 * @return array Modified validation errors.
 	 */
 	public function validate_submission( $error_validation_actions, $submit, $post_mode ) {
-		// Skip draft saves.
 		if ( 'save' === $post_mode ) {
 			return $error_validation_actions;
 		}
 
-		$form_id = isset( $submit->form_id ) ? (int) $submit->form_id : 0;
-
-		// Per-form opt-out.
-		if ( ! apply_filters( 'gaitcha_enabled_for_form', true, $form_id ) ) {
+		if ( ! $this->form_has_gaitcha_field( $submit ) ) {
 			return $error_validation_actions;
 		}
 
@@ -128,5 +205,47 @@ class WSFormConnector implements ConnectorInterface {
 		}
 
 		return $error_validation_actions;
+	}
+
+	/**
+	 * Checks whether the submitted form contains a Gaitcha field.
+	 *
+	 * @param object $submit WS Form submit object.
+	 * @return bool True if the form has a gaitcha field type.
+	 */
+	private function form_has_gaitcha_field( $submit ) {
+		if ( ! isset( $submit->form_object ) ) {
+			return false;
+		}
+
+		$fields = \WS_Form_Common::get_fields_from_form( $submit->form_object );
+
+		foreach ( $fields as $field ) {
+			if ( isset( $field->type ) && self::FIELD_TYPE === $field->type ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Finds the "Spam Protection" group key in the field types array.
+	 *
+	 * @param array $field_types Field types grouped by category.
+	 * @return string|null Group key or null if not found.
+	 */
+	private function find_spam_group_key( $field_types ) {
+		foreach ( $field_types as $key => $group ) {
+			if ( ! isset( $group['types'] ) ) {
+				continue;
+			}
+
+			if ( isset( $group['types']['recaptcha'] ) || isset( $group['types']['hcaptcha'] ) || isset( $group['types']['turnstile'] ) ) {
+				return $key;
+			}
+		}
+
+		return null;
 	}
 }
