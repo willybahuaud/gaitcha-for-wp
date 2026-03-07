@@ -1,8 +1,18 @@
 # Gaitcha for WordPress
 
-WordPress plugin that integrates [Gaitcha](https://github.com/willybahuaud/gaitcha), a self-hosted behavioral captcha, into popular form builders.
+A behavioral captcha that stays on your server.
 
-No external service, no API key, no user tracking. The captcha analyzes how the user interacts with a checkbox (mouse trajectory, keyboard timing, touch patterns) and scores the behavior server-side via HMAC-signed tokens.
+Most captcha solutions send your visitors' data to a third-party service — every interaction, every page load, every form submission. Gaitcha does the opposite: it runs entirely on your WordPress install, scores human behavior through fine-grained analysis (mouse trajectory, speed patterns, keyboard timing, touch dynamics), and never phones home.
+
+It works with a single checkbox. No puzzles, no image grids, no "select all the traffic lights". The trick is in *how* the user reaches and checks that box — mouse trajectory, speed variation, keyboard timing, touch patterns. Humans hesitate, overshoot, decelerate. Bots don't.
+
+The behavioral log is scored server-side using HMAC-signed tokens. No session, no database query, no external API. Stateless and lightweight.
+
+## What it blocks
+
+Gaitcha catches the vast majority of automated submissions: scripted bots, headless browsers, form stuffers, and credential sprayers. The scoring engine analyzes 10+ behavioral signals simultaneously — faking all of them at once in a human-like way is a hard problem.
+
+It won't stop a determined attacker running a full browser with manual-like automation (but at that point, rate limiting is your friend, not a captcha).
 
 ## Supported Form Plugins
 
@@ -27,31 +37,40 @@ Connectors are loaded conditionally — only when the corresponding form plugin 
 2. In WordPress admin, go to **Plugins > Add New > Upload Plugin**
 3. Upload the ZIP and activate
 
-The plugin generates an HMAC secret automatically on activation. No configuration needed.
+That's it. The plugin generates a cryptographic secret on activation. No API key, no account, no settings page to configure.
 
 ### Auto-updates
 
-The plugin checks GitHub Releases for new versions and integrates with the WordPress update system. Updates appear in the standard **Dashboard > Updates** screen.
+The plugin checks GitHub Releases for new versions and integrates with the WordPress update system. Updates show up in **Dashboard > Updates** like any other plugin.
 
 ## Usage
 
-Each supported form plugin gets a **Gaitcha** field type in its form builder. Add the field to your form — that's it.
+Each form plugin gets a **Gaitcha** field type in its builder. Add it to your form, publish, done.
 
 On the frontend:
-1. The form loads without any captcha visible
-2. On the first user interaction (mouse, keyboard, touch), a checkbox appears
-3. The user checks the box — behavioral data is collected silently
-4. On submit, the data is validated server-side
+1. The form loads normally — no captcha visible
+2. As soon as the user moves the mouse, touches the screen, or presses a key, a checkbox fades in
+3. The user checks the box — behavioral data is collected silently in the background
+4. On submit, the server scores the behavior and accepts or rejects
 
 ### Contact Form 7
 
-Use the `[gaitcha]` form tag, or click the **gaitcha** button in the editor toolbar to generate it.
+Use the `[gaitcha]` form tag, or click the **gaitcha** button in the editor toolbar.
 
 Optional custom label: `[gaitcha "I'm human"]`
 
 ### Other form plugins
 
 Drag the **Gaitcha** field from the builder palette into your form. The label is configurable in the field settings.
+
+## Privacy
+
+This is the whole point:
+- No data leaves your server — ever
+- No cookies, no fingerprinting, no tracking pixels
+- No external JavaScript loaded
+- Nothing to declare in your privacy policy
+- GDPR-friendly by design, not by configuration
 
 ## Hooks
 
@@ -80,12 +99,13 @@ Available options: `secret`, `ttl`, `score_threshold`, `debug`, `no_js_fallback`
 
 ## How It Works
 
-Gaitcha combines two mechanisms:
+Gaitcha combines two layers:
 
-- **Behavioral analysis**: mouse trajectory curvature, speed variation, angular jitter, endpoint deceleration, keyboard dwell time variance, tab timing entropy, touch offset patterns
-- **Stateless HMAC tokens**: each captcha init returns a random field name + signed token. No session, no database, no external API
+**Behavioral analysis** — the JS client collects interaction data in a circular buffer: mouse trajectory curvature, angular jitter, direction reversals, endpoint deceleration, speed autocorrelation, keyboard dwell times, tab timing entropy, touch offset patterns. Three profiles (mouse, keyboard, touch) are scored independently; the highest wins.
 
-The scoring engine detects three interaction profiles (mouse, keyboard, touch) and uses whichever scores highest. Several "kill signals" cause immediate rejection: interaction under 100ms, no movement before click, pixel-perfect center click, no keyboard events before a keyboard-triggered check.
+**Stateless HMAC tokens** — each form load generates a random field name and a signed token. On submit, the server verifies the signature, checks the TTL, and scores the behavioral log. No session to manage, no database table to maintain.
+
+Several "kill signals" cause immediate rejection: interaction under 100ms, zero movement before click, pixel-perfect center click, no keyboard activity before a keyboard-triggered check.
 
 ## Development
 
