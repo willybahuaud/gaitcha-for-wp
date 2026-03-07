@@ -17,7 +17,8 @@ gaitcha-for-wp/
     ├── Updater.php                 # Auto-update via GitHub Releases
     └── connectors/                 # PSR-4: GaitchaWP\Connectors\
         ├── ConnectorInterface.php  # Interface: register_hooks()
-        └── WSFormConnector.php     # WS Form: field type + enqueue + validation
+        ├── WSFormConnector.php     # WS Form: field type + enqueue + validation
+        └── CF7Connector.php        # CF7: form tag [gaitcha] + enqueue + spam filter
 ```
 
 ## Namespace & Autoload
@@ -74,6 +75,23 @@ Classes cles utilisees :
 - `Gaitcha\AbstractEndpoint` — Base pour l'endpoint init (methode `handleInit()`)
 - `Gaitcha\ValidationOrchestrator` — Pipeline de validation complet
 - `Gaitcha\ValidationResult` — Value object (isAccepted, getScore, getReason)
+
+## Contact Form 7
+
+### Approche form tag
+Gaitcha s'integre via un **form tag `[gaitcha]`** dans le template CF7.
+Usage : `[gaitcha]` ou `[gaitcha "Label custom"]`.
+
+### Hooks CF7 utilises
+- `wpcf7_init` — Enregistre le form tag `[gaitcha]`
+- `wpcf7_enqueue_scripts` — Enqueue les scripts gaitcha
+- `wpcf7_spam` (filtre, priorite 9) — Valide via ValidationOrchestrator
+- CF7 `scan_form_tags()` — Detecte la presence du tag dans le formulaire
+
+### Rendu HTML du tag
+`<div class="wpcf7-gaitcha" id="wpcf7-gaitcha-X" data-gaitcha-container="wpcf7-gaitcha-X" data-gaitcha-label="..."></div>`
+
+---
 
 ## WS Form Pro
 

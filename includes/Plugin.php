@@ -12,6 +12,7 @@ namespace GaitchaWP;
 
 use Gaitcha\Config;
 use GaitchaWP\Connectors\WSFormConnector;
+use GaitchaWP\Connectors\CF7Connector;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -62,6 +63,12 @@ class Plugin {
 		// WS Form connector.
 		if ( class_exists( 'WS_Form' ) ) {
 			$connector = new WSFormConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Contact Form 7 connector.
+		if ( class_exists( 'WPCF7' ) ) {
+			$connector = new CF7Connector( $this->config, $this->endpoint );
 			$connector->register_hooks();
 		}
 
