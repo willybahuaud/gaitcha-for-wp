@@ -72,6 +72,7 @@ class GFFieldGaitcha extends \GF_Field {
 	public function get_form_editor_field_settings() {
 		return array(
 			'label_setting',
+			'label_placement_setting',
 			'description_setting',
 			'css_class_setting',
 			'conditional_logic_field_setting',
