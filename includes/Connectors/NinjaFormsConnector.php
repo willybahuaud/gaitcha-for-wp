@@ -122,7 +122,7 @@ class NinjaFormsConnector implements ConnectorInterface {
 		wp_enqueue_script(
 			'gaitcha-ninjaforms',
 			GAITCHA_WP_URL . 'assets/js/gaitcha-ninjaforms.js',
-			array( 'gaitcha', 'nf-front-end' ),
+			array( 'jquery', 'gaitcha', 'nf-front-end' ),
 			GAITCHA_WP_VERSION,
 			true
 		);

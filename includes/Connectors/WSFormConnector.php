@@ -201,7 +201,7 @@ class WSFormConnector implements ConnectorInterface {
 
 		$orchestrator = new ValidationOrchestrator( $this->config );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Gaitcha uses HMAC token validation, not nonces.
-		$result       = $orchestrator->validate( $_POST );
+		$result       = $orchestrator->validate( wp_unslash( $_POST ) );
 
 		if ( ! $result->isAccepted() ) {
 			$error_validation_actions[] = __( 'Verification failed. Please try again.', 'gaitcha-for-wp' );
