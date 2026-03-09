@@ -3,7 +3,7 @@ Contributors: willybahuaud
 Tags: captcha, spam, security, forms, antispam
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.0.3
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -59,11 +59,12 @@ No session, no database query, no external API call. Validation is stateless and
 
 == Installation ==
 
-1. Upload the `gaitcha-for-wp` folder to `/wp-content/plugins/`
-2. Activate the plugin through the **Plugins** menu in WordPress
-3. Add the **Gaitcha** field to your forms
+1. Download the latest release ZIP from [GitHub Releases](https://github.com/willybahuaud/gaitcha-for-wp/releases)
+2. In WordPress admin, go to **Plugins > Add New > Upload Plugin**
+3. Upload the ZIP and activate
+4. Add the **Gaitcha** field to your forms
 
-No configuration needed. The plugin generates a cryptographic secret automatically on activation.
+No configuration needed. The plugin generates a cryptographic secret automatically on activation. Updates are delivered via GitHub Releases and show up in **Dashboard > Updates**.
 
 == Frequently Asked Questions ==
 
@@ -108,6 +109,15 @@ Nowhere. That's the point. All behavioral analysis happens on your server. No da
 
 == Changelog ==
 
+= 1.0.3 =
+* Anti-replay protection enabled by default
+* Scoring fixes: offset calculation, endpoint deceleration neutralized
+* Ninja Forms: full AJAX submission support
+* Gravity Forms: label placement setting
+* Translations: FR, ES, IT, DE
+* Security: XSS prevention in NF template, CF7 tag generator fixes
+* Fix: PSR-4 directory case for Linux servers
+
 = 1.0.0 =
 * Initial release
 * Connectors: WS Form Pro, Contact Form 7, Formidable Forms, Gravity Forms, WPForms, Fluent Forms, Ninja Forms
@@ -115,6 +125,9 @@ Nowhere. That's the point. All behavioral analysis happens on your server. No da
 * Auto-update via GitHub Releases
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Scoring fixes, anti-replay enabled by default, NinjaForms AJAX support, translations (FR/ES/IT/DE). Requires gaitcha core v0.5.0.
 
 = 1.0.0 =
 Initial release.
