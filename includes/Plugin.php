@@ -46,6 +46,7 @@ class Plugin {
 	 * @return void
 	 */
 	public function init() {
+
 		$secret = get_option( 'gaitcha_secret', '' );
 
 		// Bail silently if the secret is too short (plugin not activated properly).
@@ -56,10 +57,18 @@ class Plugin {
 		$options = apply_filters(
 			'gaitcha_config',
 			array(
-				'secret' => $secret,
-				'debug'  => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'secret'       => $secret,
+				'debug'        => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'anti_replay'  => true,
 			)
 		);
+
+		// Provide the default WPTokenStore when anti-replay is enabled
+		// and no custom store was supplied via the filter.
+		if ( ! empty( $options['anti_replay'] ) && empty( $options['token_store'] ) ) {
+			$ttl                    = (int) ( $options['ttl'] ?? 120 );
+			$options['token_store'] = new WPTokenStore( $ttl );
+		}
 
 		$this->config   = new Config( $options );
 		$this->endpoint = new Endpoint( $this->config );
@@ -111,4 +120,5 @@ class Plugin {
 		$updater = new Updater();
 		$updater->register_hooks();
 	}
+
 }

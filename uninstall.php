@@ -11,4 +11,5 @@
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 delete_option( 'gaitcha_secret' );
+delete_option( 'gaitcha_used_tokens' );
 delete_transient( 'gaitcha_wp_github_release' );
