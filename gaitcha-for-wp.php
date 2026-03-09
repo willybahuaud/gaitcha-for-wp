@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GAITCHA_WP_VERSION', '1.0.0' );
+define( 'GAITCHA_WP_VERSION', '1.0.2-dev' );
 define( 'GAITCHA_WP_FILE', __FILE__ );
 define( 'GAITCHA_WP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GAITCHA_WP_URL', plugin_dir_url( __FILE__ ) );

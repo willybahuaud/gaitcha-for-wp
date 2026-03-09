@@ -47,12 +47,7 @@
 
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container,
-			classes: {
-				field: '',
-				checkbox: 'ff-el-form-check-input ff-el-form-check-checkbox',
-				label: 'ff-el-form-check-label'
-			}
+			container: container
 		});
 	}
 

@@ -157,10 +157,5 @@ class FormidableConnector implements ConnectorInterface {
 			)
 		);
 
-		// Align gaitcha checkbox+label with native Formidable checkboxes.
-		wp_add_inline_style(
-			'formidable',
-			'.frm_checkbox .gaitcha-checkbox, .frm_checkbox .gaitcha-label { display: inline; vertical-align: middle; } .frm_checkbox .gaitcha-label { margin-left: 4px; }'
-		);
 	}
 }

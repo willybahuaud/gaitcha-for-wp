@@ -47,12 +47,7 @@
 
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container,
-			classes: {
-				field: '',
-				checkbox: '',
-				label: 'wpforms-field-label-inline'
-			}
+			container: container
 		});
 	}
 

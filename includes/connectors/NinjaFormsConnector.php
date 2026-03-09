@@ -85,11 +85,13 @@ class NinjaFormsConnector implements ConnectorInterface {
 	public function output_template() {
 		?>
 		<script id="tmpl-nf-field-gaitcha" type="text/template">
-			<div id="nf-gaitcha-{{ data.id }}"
-				class="nf-gaitcha-container"
-				data-gaitcha-container="nf-gaitcha-{{ data.id }}"
-				data-gaitcha-label="{{ data.label }}">
-			</div>
+			<ul>
+				<li id="nf-gaitcha-{{ data.id }}"
+					class="nf-gaitcha-container"
+					data-gaitcha-container="nf-gaitcha-{{ data.id }}"
+					data-gaitcha-label="{{ data.label }}">
+				</li>
+			</ul>
 		</script>
 		<?php
 	}
@@ -100,6 +102,15 @@ class NinjaFormsConnector implements ConnectorInterface {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		// Hide the native NF label for gaitcha fields (the widget has its own).
+		wp_register_style( 'gaitcha-ninjaforms', false, array(), GAITCHA_WP_VERSION );
+		wp_enqueue_style( 'gaitcha-ninjaforms' );
+		wp_add_inline_style(
+			'gaitcha-ninjaforms',
+			'.gaitcha-container .nf-field-label { display: none; }'
+			. ' .gaitcha-container .nf-field-element ul { list-style: none; margin: 0; padding: 0; }'
+		);
+
 		wp_enqueue_script(
 			'gaitcha',
 			GAITCHA_WP_URL . 'assets/js/gaitcha.min.js',

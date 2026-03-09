@@ -48,12 +48,7 @@
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container,
-			classes: {
-				field: 'gaitcha-field',
-				checkbox: 'gaitcha-checkbox wpcf7-form-control',
-				label: 'gaitcha-label'
-			}
+			container: container
 		});
 	}
 

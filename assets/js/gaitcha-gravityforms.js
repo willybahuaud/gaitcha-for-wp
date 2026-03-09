@@ -48,12 +48,7 @@
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container,
-			classes: {
-				field: '',
-				checkbox: 'gfield-choice-input',
-				label: 'gform-field-label gform-field-label--type-inline'
-			}
+			container: container
 		});
 	}
 

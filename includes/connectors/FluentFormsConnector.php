@@ -61,7 +61,7 @@ class FluentFormsConnector implements ConnectorInterface {
 		add_filter( 'fluentform/editor_components', array( $this, 'register_component' ) );
 		add_action( 'fluentform/render_item_' . self::ELEMENT, array( $this, 'render_field' ), 10, 2 );
 		add_filter( 'fluentform/validate_input_item_' . self::ELEMENT, array( $this, 'validate_field' ), 10, 5 );
-		add_action( 'fluentform/rendering_form', array( $this, 'maybe_enqueue_scripts' ) );
+		add_filter( 'fluentform/rendering_form', array( $this, 'maybe_enqueue_scripts' ) );
 	}
 
 	/**
@@ -80,6 +80,8 @@ class FluentFormsConnector implements ConnectorInterface {
 			),
 			'settings'       => array(
 				'label'            => __( 'Gaitcha', 'gaitcha-for-wp' ),
+				'tnc_html'         => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'has_checkbox'     => true,
 				'help_message'     => '',
 				'container_class'  => '',
 				'validation_rules' => array(),
@@ -87,7 +89,7 @@ class FluentFormsConnector implements ConnectorInterface {
 			'editor_options' => array(
 				'title'      => 'Gaitcha',
 				'icon_class' => 'ff-edit-checkbox-1',
-				'template'   => 'inputHidden',
+				'template'   => 'termsCheckbox',
 			),
 		);
 
@@ -103,7 +105,7 @@ class FluentFormsConnector implements ConnectorInterface {
 	 */
 	public function render_field( $data, $form ) {
 		$form_id      = absint( $form->id );
-		$label        = ! empty( $data['settings']['label'] ) ? $data['settings']['label'] : '';
+		$label        = ! empty( $data['settings']['tnc_html'] ) ? $data['settings']['tnc_html'] : '';
 		$container_id = 'ff-gaitcha-' . $form_id;
 
 		$container_class = 'ff-el-group';
@@ -151,11 +153,11 @@ class FluentFormsConnector implements ConnectorInterface {
 	/**
 	 * Enqueues scripts when a form is rendered.
 	 *
-	 * Fluent Forms doesn't expose per-field enqueue hooks easily,
-	 * so we enqueue on every form render. The JS is a no-op without containers.
+	 * Fluent Forms uses applyFilters (not do_action) for this hook,
+	 * so the form object must be returned to avoid breaking the chain.
 	 *
 	 * @param object $form Form object.
-	 * @return void
+	 * @return object The unmodified form object.
 	 */
 	public function maybe_enqueue_scripts( $form ) {
 		wp_enqueue_script(
@@ -182,5 +184,7 @@ class FluentFormsConnector implements ConnectorInterface {
 				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
 			)
 		);
+
+		return $form;
 	}
 }

@@ -108,6 +108,30 @@ class WPFormsConnector implements ConnectorInterface {
 				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
 			)
 		);
+
+		// Override WPForms CSS that breaks the Gaitcha widget layout.
+		wp_add_inline_style(
+			'wpforms-full',
+			$this->get_override_css()
+		);
+	}
+
+	/**
+	 * Returns CSS overrides to isolate the Gaitcha widget from WPForms styles.
+	 *
+	 * WPForms applies overflow-x:hidden on field containers and max-width:100%
+	 * on direct children, which breaks the widget flex layout.
+	 *
+	 * @return string
+	 */
+	private function get_override_css() {
+		// WPForms applies overflow-x:hidden on field containers and max-width:100%
+		// on direct children — both break the widget flex layout.
+		// Widget-internal positions are handled by gaitcha core CSS (!important).
+		return '
+			.wpforms-field-gaitcha { overflow: visible !important; }
+			.wpforms-field-gaitcha > .wpforms-gaitcha-container { max-width: none !important; }
+		';
 	}
 
 	/**

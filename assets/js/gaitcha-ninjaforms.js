@@ -16,13 +16,17 @@
 	/**
 	 * Reads the label from the container's data attribute.
 	 *
+	 * NF always sets the initial label to the field nicename ("Gaitcha")
+	 * regardless of PHP settingDefaults. Fall back to the configured
+	 * default when the label is empty or matches the nicename.
+	 *
 	 * @param {HTMLElement} container The gaitcha container element.
 	 * @return {string} The label text, or the default label.
 	 */
 	function readFieldLabel(container) {
 		var label = container.getAttribute('data-gaitcha-label');
 
-		if (label && label.trim()) {
+		if (label && label.trim() && label.trim().toLowerCase() !== 'gaitcha') {
 			return label.trim();
 		}
 
@@ -47,12 +51,7 @@
 
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container,
-			classes: {
-				field: '',
-				checkbox: 'nf-element',
-				label: ''
-			}
+			container: container
 		});
 	}
 

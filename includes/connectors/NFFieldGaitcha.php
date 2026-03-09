@@ -3,7 +3,7 @@
  * Ninja Forms field type for Gaitcha.
  *
  * Extends NF_Abstracts_Field to register a captcha checkbox field
- * with server-side validation.
+ * with label setting and server-side validation.
  *
  * @package GaitchaWP\Connectors
  */
@@ -63,11 +63,13 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 	protected $_templates = 'gaitcha';
 
 	/**
-	 * Settings to exclude from the field.
+	 * Common settings to expose in the builder.
+	 *
+	 * Only label and description — no default, placeholder, required, etc.
 	 *
 	 * @var array
 	 */
-	protected $_settings_exclude = array( 'default', 'placeholder', 'input_limit_set' );
+	protected $_settings_all_fields = array( 'label', 'classes', 'key' );
 
 	/**
 	 * Gaitcha configuration.
@@ -85,6 +87,8 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 		parent::__construct();
 
 		$this->_nicename = __( 'Gaitcha', 'gaitcha-for-wp' );
+
+		$this->_settings['label']['value'] = __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
 	}
 
 	/**
