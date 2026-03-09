@@ -1,0 +1,108 @@
+# Copyright (C) 2026 Willy Bahuaud
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Gaitcha for WordPress 1.0.3\n"
+"Report-Msgid-Bugs-To: https://github.com/willybahuaud/gaitcha-for-wp/issues\n"
+"POT-Creation-Date: 2026-03-09T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#. Plugin Name of the plugin
+msgid "Gaitcha for WordPress"
+msgstr ""
+
+#. Description of the plugin
+msgid "Self-hosted behavioral captcha — no external dependency."
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
+#: includes/Connectors/FluentFormsConnector.php
+#: includes/Connectors/FormidableConnector.php
+#: includes/Connectors/FrmFieldGaitcha.php
+#: includes/Connectors/GravityFormsConnector.php
+#: includes/Connectors/NFFieldGaitcha.php
+#: includes/Connectors/NinjaFormsConnector.php
+#: includes/Connectors/WPFormsConnector.php
+#: includes/Connectors/WPFormsFieldGaitcha.php
+#: includes/Connectors/WSFormConnector.php
+msgid "Yes, I'm a real person"
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
+#: includes/Connectors/FluentFormsConnector.php
+#: includes/Connectors/FormidableConnector.php
+#: includes/Connectors/GravityFormsConnector.php
+#: includes/Connectors/NFFieldGaitcha.php
+#: includes/Connectors/WPFormsConnector.php
+#: includes/Connectors/WSFormConnector.php
+msgid "Verification failed. Please try again."
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
+#: includes/Connectors/FluentFormsConnector.php
+#: includes/Connectors/GFFieldGaitcha.php
+#: includes/Connectors/NFFieldGaitcha.php
+msgid "Gaitcha"
+msgstr ""
+
+#: includes/Connectors/GFFieldGaitcha.php
+msgid "Adds a Gaitcha behavioral captcha checkbox to your form."
+msgstr ""
+
+#: includes/Connectors/GFFieldGaitcha.php
+#: includes/Connectors/FrmFieldGaitcha.php
+msgid "Gaitcha captcha will appear here"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "captcha spam gaitcha behavioral"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Basic"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Advanced"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Style"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Classes"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Breakpoints"
+msgstr ""
+
+#: includes/Connectors/WSFormConnector.php
+msgid "Spam Protection"
+msgstr ""
+
+#: includes/Connectors/WPFormsFieldGaitcha.php
+msgid "captcha spam gaitcha"
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
+msgid "Gaitcha form-tag generator"
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
+msgid "Generates a form-tag for the Gaitcha captcha checkbox."
+msgstr ""
+
+#: includes/Updater.php
+msgid "Unable to rename the plugin directory."
+msgstr ""
+
+#: includes/Updater.php
+msgid "No release notes available."
+msgstr ""

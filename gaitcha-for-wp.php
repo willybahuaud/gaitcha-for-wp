@@ -48,6 +48,16 @@ function gaitcha_wp_deactivate() {
 register_deactivation_hook( __FILE__, 'gaitcha_wp_deactivate' );
 
 /**
+ * Loads the plugin text domain for translations.
+ *
+ * @return void
+ */
+function gaitcha_wp_load_textdomain() {
+	load_plugin_textdomain( 'gaitcha-for-wp', false, dirname( GAITCHA_WP_BASENAME ) . '/languages' );
+}
+add_action( 'init', 'gaitcha_wp_load_textdomain' );
+
+/**
  * Bootstraps the plugin after all plugins are loaded.
  *
  * @return void
