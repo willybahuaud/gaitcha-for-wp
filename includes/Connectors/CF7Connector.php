@@ -43,6 +43,13 @@ class CF7Connector implements ConnectorInterface {
 	private $endpoint;
 
 	/**
+	 * Tag generator instance (used during panel rendering).
+	 *
+	 * @var \WPCF7_TagGeneratorGenerator|null
+	 */
+	private $tag_generator;
+
+	/**
 	 * @param Config   $config   Gaitcha configuration.
 	 * @param Endpoint $endpoint REST endpoint.
 	 */
@@ -159,7 +166,7 @@ class CF7Connector implements ConnectorInterface {
 	 * @return void
 	 */
 	public function render_tag_generator_panel( $contact_form, $options ) {
-		$tgg = new \WPCF7_TagGeneratorGenerator( $options['content'] );
+		$this->tag_generator = new \WPCF7_TagGeneratorGenerator( $options['content'] );
 
 		$formatter = new \WPCF7_HTMLFormatter();
 
@@ -177,23 +184,15 @@ class CF7Connector implements ConnectorInterface {
 		$formatter->append_preformatted(
 			esc_html__( 'Generates a form-tag for the Gaitcha captcha checkbox.', 'gaitcha-for-wp' )
 		);
+		$formatter->end_tag( 'p' );
+
 		$formatter->end_tag( 'header' );
 
 		$formatter->append_start_tag( 'div', array(
 			'class' => 'control-box',
 		) );
 
-		$formatter->call_user_func( static function () use ( $tgg ) {
-			$tgg->print( 'field_type', array(
-				'select_options' => array(
-					'gaitcha' => __( 'Gaitcha', 'gaitcha-for-wp' ),
-				),
-			) );
-
-			$tgg->print( 'default_value', array(
-				'title' => __( 'Label', 'contact-form-7' ),
-			) );
-		} );
+		$formatter->call_user_func( array( $this, 'print_tag_generator_fields' ) );
 
 		$formatter->end_tag( 'div' );
 
@@ -201,11 +200,41 @@ class CF7Connector implements ConnectorInterface {
 			'class' => 'insert-box',
 		) );
 
-		$formatter->call_user_func( static function () use ( $tgg ) {
-			$tgg->print( 'insert_box_content' );
-		} );
+		$formatter->call_user_func( array( $this, 'print_tag_generator_insert_box' ) );
+
+		$formatter->end_tag( 'footer' );
 
 		$formatter->print();
+	}
+
+	/**
+	 * Prints the field type and label fields inside the tag generator panel.
+	 *
+	 * Called by WPCF7_HTMLFormatter::call_user_func().
+	 *
+	 * @return void
+	 */
+	public function print_tag_generator_fields() {
+		$this->tag_generator->print( 'field_type', array(
+			'select_options' => array(
+				'gaitcha' => __( 'Gaitcha', 'gaitcha-for-wp' ),
+			),
+		) );
+
+		$this->tag_generator->print( 'default_value', array(
+			'title' => __( 'Label', 'gaitcha-for-wp' ),
+		) );
+	}
+
+	/**
+	 * Prints the insert box inside the tag generator panel.
+	 *
+	 * Called by WPCF7_HTMLFormatter::call_user_func().
+	 *
+	 * @return void
+	 */
+	public function print_tag_generator_insert_box() {
+		$this->tag_generator->print( 'insert_box_content' );
 	}
 
 	/**

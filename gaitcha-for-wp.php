@@ -3,7 +3,7 @@
  * Plugin Name: Gaitcha for WordPress
  * Plugin URI:  https://github.com/willybahuaud/gaitcha-for-wp
  * Description: Self-hosted behavioral captcha — no external dependency.
- * Version:     1.0.0
+ * Version:     1.0.3
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author:      Willy Bahuaud
@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GAITCHA_WP_VERSION', '1.0.3-dev' );
+define( 'GAITCHA_WP_VERSION', '1.0.3' );
 define( 'GAITCHA_WP_FILE', __FILE__ );
 define( 'GAITCHA_WP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GAITCHA_WP_URL', plugin_dir_url( __FILE__ ) );

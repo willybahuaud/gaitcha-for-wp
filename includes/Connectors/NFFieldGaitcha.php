@@ -79,13 +79,16 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 	private $gaitcha_config;
 
 	/**
-	 * Cached validation result.
+	 * Cached validation result per request.
 	 *
 	 * Ninja Forms calls validate() multiple times per request.
 	 * We cache the result to avoid consuming the anti-replay token
 	 * on the first call and getting rejected on the second.
 	 *
-	 * @var array|string|null
+	 * Keyed by a request-unique identifier to avoid stale cache
+	 * in persistent PHP runtimes (Swoole, FrankenPHP worker mode).
+	 *
+	 * @var array{ id: string, result: array|string }|null
 	 */
 	private static $cached_result = null;
 
@@ -111,15 +114,19 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 	 */
 	public function validate( $field, $data ) {
 		// NF calls validate() multiple times per request — return cached result.
-		if ( null !== self::$cached_result ) {
-			return self::$cached_result;
+		// Use REQUEST_TIME_FLOAT as request-scoped key to avoid stale cache
+		// in persistent PHP runtimes (Swoole, FrankenPHP worker mode).
+		$request_id = (string) ( $_SERVER['REQUEST_TIME_FLOAT'] ?? '' );
+
+		if ( null !== self::$cached_result && self::$cached_result['id'] === $request_id ) {
+			return self::$cached_result['result'];
 		}
 
 		// Admin bypass.
 		$bypass_admin = apply_filters( 'gaitcha_bypass_admin', current_user_can( 'manage_options' ) );
 		if ( $bypass_admin ) {
-			self::$cached_result = array();
-			return self::$cached_result;
+			self::$cached_result = array( 'id' => $request_id, 'result' => array() );
+			return self::$cached_result['result'];
 		}
 
 		$orchestrator = new ValidationOrchestrator( $this->gaitcha_config );
@@ -127,11 +134,12 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 		$result       = $orchestrator->validate( wp_unslash( $_POST ) );
 
 		if ( ! $result->isAccepted() ) {
-			self::$cached_result = __( 'Verification failed. Please try again.', 'gaitcha-for-wp' );
-			return self::$cached_result;
+			$validation_result   = __( 'Verification failed. Please try again.', 'gaitcha-for-wp' );
+			self::$cached_result = array( 'id' => $request_id, 'result' => $validation_result );
+			return $validation_result;
 		}
 
-		self::$cached_result = array();
-		return self::$cached_result;
+		self::$cached_result = array( 'id' => $request_id, 'result' => array() );
+		return self::$cached_result['result'];
 	}
 }

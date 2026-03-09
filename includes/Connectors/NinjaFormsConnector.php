@@ -89,7 +89,7 @@ class NinjaFormsConnector implements ConnectorInterface {
 				<li id="nf-gaitcha-{{ data.id }}"
 					class="nf-gaitcha-container"
 					data-gaitcha-container="nf-gaitcha-{{ data.id }}"
-					data-gaitcha-label="{{ data.label }}">
+					data-gaitcha-label="{{ _.escape( data.label ) }}">
 				</li>
 			</ul>
 		</script>

@@ -62,6 +62,9 @@ msgstr "Protezione antispam"
 msgid "captcha spam gaitcha"
 msgstr "captcha spam gaitcha"
 
+msgid "Label"
+msgstr "Etichetta"
+
 msgid "Gaitcha form-tag generator"
 msgstr "Generatore di tag modulo Gaitcha"
 

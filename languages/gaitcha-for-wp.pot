@@ -92,6 +92,10 @@ msgid "captcha spam gaitcha"
 msgstr ""
 
 #: includes/Connectors/CF7Connector.php
+msgid "Label"
+msgstr ""
+
+#: includes/Connectors/CF7Connector.php
 msgid "Gaitcha form-tag generator"
 msgstr ""
 
