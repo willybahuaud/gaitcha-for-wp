@@ -16,10 +16,13 @@ gaitcha-for-wp/
 │   ├── gaitcha-gravityforms.js     # Adapter JS pour Gravity Forms
 │   ├── gaitcha-wpforms.js          # Adapter JS pour WPForms
 │   ├── gaitcha-fluentforms.js      # Adapter JS pour Fluent Forms
-│   └── gaitcha-ninjaforms.js       # Adapter JS pour Ninja Forms
+│   ├── gaitcha-ninjaforms.js       # Adapter JS pour Ninja Forms
+│   ├── gaitcha-elementor.js       # Adapter JS pour Elementor Pro Forms
+│   └── gaitcha-native.js          # Adapter JS pour formulaires natifs WP
 ├── languages/                      # Traductions (FR, ES, IT, DE)
 └── includes/                       # PSR-4: GaitchaWP\ (fichiers nommes par classe)
     ├── Plugin.php                  # Orchestrateur (Config, Endpoint, Connectors)
+    ├── Settings.php                # Page de reglages (theme, formulaires natifs)
     ├── Endpoint.php                # REST POST /wp-json/gaitcha/v1/init
     ├── Updater.php                 # Auto-update via GitHub Releases
     ├── WPTokenStore.php            # Anti-replay via wp_options
@@ -35,7 +38,9 @@ gaitcha-for-wp/
         ├── FormidableConnector.php # Formidable: field type + enqueue + validation
         ├── FrmFieldGaitcha.php     # Formidable: FrmFieldType extension
         ├── NinjaFormsConnector.php # NF: field type + template + enqueue
-        └── NFFieldGaitcha.php      # NF: NF_Abstracts_Field extension + validation
+        ├── NFFieldGaitcha.php      # NF: NF_Abstracts_Field extension + validation
+        ├── ElementorProConnector.php # Elementor Pro: handler pattern + enqueue + validation
+        └── NativeFormsConnector.php # WP natif: login, register, lostpassword, comments
 ```
 
 ## Namespace & Autoload
@@ -52,6 +57,24 @@ gaitcha-for-wp/
 - `GAITCHA_WP_PATH` — `plugin_dir_path()`
 - `GAITCHA_WP_URL` — `plugin_dir_url()`
 - `GAITCHA_WP_BASENAME` — `plugin_basename()`
+
+## Settings (page de reglages)
+
+Option unique `gaitcha_settings` (array serialise) avec `wp_parse_args()` + defaults.
+Page admin sous Reglages > Gaitcha (`add_options_page`).
+Lien "Reglages" dans la liste des plugins.
+
+### Cles
+- `theme` — `'light'` (defaut), `'dark'`, `'auto'`
+- `protect_login` — bool
+- `protect_register` — bool
+- `protect_lostpassword` — bool
+- `protect_comments` — bool
+
+### Acces statique
+- `Settings::get_settings()` — Retourne le tableau complet
+- `Settings::get_theme()` — Retourne le theme courant
+- `Settings::is_protected($key)` — Verifie si une protection est activee
 
 ## Hooks exposes
 
@@ -170,7 +193,8 @@ Gaitcha s'integre comme un element custom de type `tnc` (Terms & Conditions).
 ### Hooks FF utilises
 - `fluentform/loaded` — Enregistre l'element
 - `fluentform/rendering_form` — Enqueue conditionnel
-- `fluentform/validate_input_item_input_checkbox` — Valide via ValidationOrchestrator
+- `fluentform/form_input_types` — Enregistre 'gaitcha' comme input type (sinon le parser l'exclut)
+- `fluentform/validate_input_item_gaitcha` — Valide via ValidationOrchestrator
 
 ---
 
@@ -203,3 +227,59 @@ Template Underscore.js pour le rendu Backbone.
 - `ninja_forms_register_fields` — Enregistre le field type
 - `ninja_forms_output_templates` — Output le template Underscore
 - `nf_display_enqueue_scripts` — Enqueue conditionnel
+
+---
+
+## Elementor Pro Forms
+
+### Approche handler
+Gaitcha suit le pattern "handler" d'Elementor Pro (comme Honeypot_Handler et
+Recaptcha_Handler), pas Field_Base. Un seul fichier : `ElementorProConnector`.
+
+### Specificites Elementor Pro
+- Soumission AJAX (`elementor_pro_forms_send_form`)
+- Validation globale via `elementor_pro/forms/validation` (pas field-specific)
+- Le champ gaitcha est retire du record apres validation (`remove_field`)
+  pour ne pas apparaitre dans les emails/actions
+- Enqueue conditionnel : scripts charges dans `render_field()`, uniquement
+  quand le champ est present dans le formulaire
+- Labels caches (`filter_field_item`) : Gaitcha genere le sien via JS
+- Controls "Required" et "Width" caches dans l'editeur (`update_controls`)
+
+### Hooks Elementor Pro utilises
+- `elementor_pro/forms/field_types` — Ajoute "Gaitcha" au dropdown
+- `elementor_pro/forms/render/item` — Cache le label
+- `elementor_pro/forms/render_field/gaitcha` — Rend le container
+- `elementor_pro/forms/validation` — Valide via ValidationOrchestrator
+- `elementor/element/form/section_form_fields/before_section_end` — Cache controls inutiles
+
+### Events JS Elementor
+- `reset` — Triggered par jQuery sur le form apres succes
+- `error` — Triggered par jQuery sur le form apres erreur validation
+
+### Resilience
+- Detection : `did_action('elementor/loaded') && class_exists('ElementorPro\Plugin')`
+- Pas de dependance directe aux classes internes d'Elementor Pro
+- `update_controls` verifie l'existence de `controls_manager` avant d'agir
+
+---
+
+## Formulaires natifs WordPress
+
+### Approche hooks natifs
+`NativeFormsConnector` branche les hooks WordPress standards pour chaque
+formulaire. Chaque protection est activable individuellement via la page de reglages.
+
+### Hooks WordPress utilises
+- `login_form` + `authenticate` — Formulaire de connexion
+- `register_form` + `registration_errors` — Formulaire d'inscription
+- `lostpassword_form` + `lostpassword_post` — Mot de passe oublie
+- `comment_form_submit_field` + `preprocess_comment` — Commentaires
+
+### Specificites
+- Login : valide a priorite 50 sur `authenticate` (apres les checks credentials)
+  pour ne pas reveler si un compte existe
+- Commentaires : `wp_die()` avec back_link (pas d'AJAX sur les commentaires natifs)
+- Enqueue separe : `login_enqueue_scripts` pour wp-login.php,
+  `wp_enqueue_scripts` (conditionne a `is_singular()`) pour les commentaires
+- Toutes les protections desactivees par defaut

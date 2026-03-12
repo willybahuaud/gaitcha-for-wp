@@ -10,6 +10,8 @@
 
 namespace GaitchaWP\Connectors;
 
+use GaitchaWP\WidgetPreview;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -23,6 +25,16 @@ class GFFieldGaitcha extends \GF_Field {
 	 * @var string
 	 */
 	public $type = 'gaitcha';
+
+	/**
+	 * Field label shown in the GF editor.
+	 *
+	 * Always "Gaitcha" — the captcha label displayed inside
+	 * the widget is managed by JS and translated via l10n.
+	 *
+	 * @var string
+	 */
+	public $label = 'Gaitcha';
 
 	/**
 	 * Returns the field title for the form editor.
@@ -71,8 +83,6 @@ class GFFieldGaitcha extends \GF_Field {
 	 */
 	public function get_form_editor_field_settings() {
 		return array(
-			'label_setting',
-			'label_placement_setting',
 			'description_setting',
 			'css_class_setting',
 			'conditional_logic_field_setting',
@@ -97,25 +107,22 @@ class GFFieldGaitcha extends \GF_Field {
 
 		if ( $this->is_form_editor() ) {
 			return sprintf(
-				'<div class="ginput_container ginput_container_checkbox"><div class="gfield_checkbox"><em>%s</em></div></div>',
-				esc_html__( 'Gaitcha captcha will appear here', 'gaitcha-for-wp' )
+				'<div class="ginput_container ginput_container_checkbox"><div class="gfield_checkbox">%s</div></div>',
+				WidgetPreview::render()
 			);
 		}
-
-		$label = $this->label;
 
 		return sprintf(
 			'<div class="ginput_container ginput_container_checkbox">'
 			. '<div class="gfield_checkbox" id="input_%d_%d">'
-			. '<div class="gchoice" id="gaitcha_%d_%d" data-gaitcha-container="gaitcha_%d_%d" data-gaitcha-label="%s"></div>'
+			. '<div class="gchoice" id="gaitcha_%d_%d" data-gaitcha-container="gaitcha_%d_%d"></div>'
 			. '</div></div>',
 			$form_id,
 			$field_id,
 			$form_id,
 			$field_id,
 			$form_id,
-			$field_id,
-			esc_attr( $label )
+			$field_id
 		);
 	}
 

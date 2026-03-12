@@ -13,6 +13,7 @@ namespace GaitchaWP\Connectors;
 use Gaitcha\Config;
 use Gaitcha\ValidationOrchestrator;
 use GaitchaWP\Endpoint;
+use GaitchaWP\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -96,7 +97,6 @@ class CF7Connector implements ConnectorInterface {
 	 * @return string HTML output.
 	 */
 	public function render_form_tag( $tag ) {
-		$label    = ! empty( $tag->values ) ? $tag->values[0] : '';
 		$field_id = 'wpcf7-gaitcha-' . wp_unique_id();
 
 		return sprintf(
@@ -105,7 +105,6 @@ class CF7Connector implements ConnectorInterface {
 				'class'                  => 'wpcf7-gaitcha',
 				'id'                     => $field_id,
 				'data-gaitcha-container' => $field_id,
-				'data-gaitcha-label'     => $label,
 			) )
 		);
 	}
@@ -137,7 +136,8 @@ class CF7Connector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
+				'theme'        => Settings::get_theme(),
 			)
 		);
 	}
@@ -219,10 +219,6 @@ class CF7Connector implements ConnectorInterface {
 			'select_options' => array(
 				'gaitcha' => __( 'Gaitcha', 'gaitcha-for-wp' ),
 			),
-		) );
-
-		$this->tag_generator->print( 'default_value', array(
-			'title' => __( 'Label', 'gaitcha-for-wp' ),
 		) );
 	}
 

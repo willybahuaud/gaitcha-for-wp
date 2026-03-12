@@ -10,24 +10,8 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
-
-	/**
-	 * Reads the label from the container's data attribute.
-	 *
-	 * @param {HTMLElement} container The gaitcha container element.
-	 * @return {string} The label text, or the default label.
-	 */
-	function readFieldLabel(container) {
-		var label = container.getAttribute('data-gaitcha-label');
-
-		if (label && label.trim()) {
-			return label.trim();
-		}
-
-		return config.defaultLabel || '';
-	}
 
 	/**
 	 * Initializes Gaitcha on a single container element.
@@ -46,8 +30,9 @@
 		}
 
 		Gaitcha.init(form, config.endpoint, {
-			label: readFieldLabel(container),
-			container: container
+			label: config.defaultLabel || '',
+			container: container,
+			theme: config.theme || 'light'
 		});
 	}
 
@@ -74,5 +59,49 @@
 	// Re-scan after WPForms AJAX form submissions (jQuery event, loaded by WPForms).
 	if (typeof jQuery !== 'undefined') {
 		jQuery(document).on('wpformsAjaxSubmitSuccessConfirmation', scanContainers);
+
+		/**
+		 * Resets Gaitcha after a WPForms server-side validation error.
+		 *
+		 * WPForms shows errors inline without re-rendering the form.
+		 * The captcha stays checked with stale data — intercept AJAX
+		 * responses to detect failed submissions and reset.
+		 *
+		 * @param {Object} event    jQuery AJAX complete event.
+		 * @param {Object} xhr      The XMLHttpRequest object.
+		 * @param {Object} settings jQuery AJAX settings.
+		 * @return {void}
+		 */
+		jQuery(document).ajaxComplete(function handleWPFormsAjaxComplete(event, xhr, settings) {
+			// WPForms sends FormData (not a string) — check via .get().
+			var isWPFormsSubmit = false;
+			if (settings && settings.data instanceof FormData) {
+				isWPFormsSubmit = settings.data.get('action') === 'wpforms_submit';
+			} else if (settings && typeof settings.data === 'string') {
+				isWPFormsSubmit = settings.data.indexOf('action=wpforms_submit') !== -1;
+			}
+
+			if (!isWPFormsSubmit) {
+				return;
+			}
+
+			var response;
+			try {
+				response = JSON.parse(xhr.responseText);
+			} catch (e) {
+				return;
+			}
+
+			// Only reset on failed submissions (validation errors).
+			if (response && !response.success) {
+				var containers = document.querySelectorAll('.wpforms-gaitcha-container[data-gaitcha-container]');
+				for (var i = 0; i < containers.length; i++) {
+					var form = containers[i].closest('form');
+					if (form) {
+						Gaitcha.reset(form);
+					}
+				}
+			}
+		});
 	}
 })();

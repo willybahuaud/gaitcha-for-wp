@@ -23,8 +23,20 @@ It won't stop a determined attacker running a full browser with manual-like auto
 - [WPForms](https://wpforms.com/)
 - [Fluent Forms](https://fluentforms.com/)
 - [Ninja Forms](https://ninjaforms.com/)
+- [Elementor Pro Forms](https://elementor.com/)
 
 Connectors are loaded conditionally — only when the corresponding form plugin is active.
+
+## Native WordPress Forms
+
+Gaitcha can also protect the built-in WordPress forms — no form plugin needed:
+
+- **Login** (`wp-login.php`)
+- **Registration**
+- **Lost password**
+- **Comments**
+
+Each one is toggled independently from **Settings > Gaitcha**. All disabled by default, so nothing changes until you opt in.
 
 ## Requirements
 
@@ -37,11 +49,26 @@ Connectors are loaded conditionally — only when the corresponding form plugin 
 2. In WordPress admin, go to **Plugins > Add New > Upload Plugin**
 3. Upload the ZIP and activate
 
-That's it. The plugin generates a cryptographic secret on activation. No API key, no account, no settings page to configure.
+That's it. The plugin generates a cryptographic secret on activation. No API key, no account needed.
+
+A settings page is available under **Settings > Gaitcha** for optional configuration — widget theme and native form protections. The defaults work out of the box.
 
 ### Auto-updates
 
 The plugin checks GitHub Releases for new versions and integrates with the WordPress update system. Updates show up in **Dashboard > Updates** like any other plugin.
+
+## Settings
+
+Go to **Settings > Gaitcha** in the WordPress admin. Two sections:
+
+**Theme** — controls the widget appearance.
+- `light` (default) — light background, dark text
+- `dark` — dark background, light text
+- `auto` — follows the visitor's OS preference via `prefers-color-scheme`
+
+The theme applies to all Gaitcha widgets across every connector.
+
+**Native form protections** — toggle Gaitcha on WordPress built-in forms (login, registration, lost password, comments). All off by default.
 
 ## Usage
 
@@ -58,6 +85,10 @@ On the frontend:
 Use the `[gaitcha]` form tag, or click the **gaitcha** button in the editor toolbar.
 
 Optional custom label: `[gaitcha "I'm human"]`
+
+### Elementor Pro Forms
+
+Add a **Gaitcha** field to your form widget in the Elementor editor. It follows the handler pattern (like Honeypot) — no separate field class. The widget handles AJAX submission and resets automatically on validation errors.
 
 ### Other form plugins
 
@@ -101,7 +132,7 @@ Available options: `secret`, `ttl`, `score_threshold`, `debug`, `no_js_fallback`
 
 Gaitcha combines two layers:
 
-**Behavioral analysis** — the JS client collects interaction data in a circular buffer: mouse trajectory curvature, angular jitter, direction reversals, endpoint deceleration, speed autocorrelation, keyboard dwell times, tab timing entropy, touch offset patterns. Three profiles (mouse, keyboard, touch) are scored independently; the highest wins.
+**Behavioral analysis** — the JS client collects interaction data in a circular buffer: mouse trajectory curvature, angular jitter, direction reversals, endpoint deceleration, speed autocorrelation, keyboard dwell times, tab timing entropy, touch offset patterns. Three profiles (mouse, keyboard, touch) are scored independently; the highest wins. Touch scoring has been refined for mobile — pressure, radius, and gesture dynamics are now factored into the touch profile.
 
 **Stateless HMAC tokens** — each form load generates a random field name and a signed token. On submit, the server verifies the signature, checks the TTL, and scores the behavioral log. No session to manage, no database table to maintain.
 
@@ -113,7 +144,7 @@ Several "kill signals" cause immediate rejection: interaction under 100ms, zero 
 composer install
 ```
 
-The core Gaitcha library is pulled via Composer (`wabeo/gaitcha`). The JS client (`assets/js/gaitcha.min.js`) is a pre-built bundle from the core library.
+The core Gaitcha library is pulled via Composer (`willybahuaud/gaitcha`). The JS client (`assets/js/gaitcha.min.js`) is a pre-built bundle from the core library.
 
 ## License
 

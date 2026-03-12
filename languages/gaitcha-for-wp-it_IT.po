@@ -23,8 +23,8 @@ msgstr "Gaitcha per WordPress"
 msgid "Self-hosted behavioral captcha — no external dependency."
 msgstr "Captcha comportamentale self-hosted — nessuna dipendenza esterna."
 
-msgid "Yes, I'm a real person"
-msgstr "Sì, sono una persona vera"
+msgid "I'm a real person"
+msgstr "Sono umano"
 
 msgid "Verification failed. Please try again."
 msgstr "Verifica fallita. Per favore, riprova."
@@ -76,3 +76,48 @@ msgstr "Impossibile rinominare la cartella del plugin."
 
 msgid "No release notes available."
 msgstr "Nessuna nota di rilascio disponibile."
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Gaitcha Settings"
+msgstr "Impostazioni Gaitcha"
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Widget theme"
+msgstr "Tema del widget"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Follow system preference"
+msgstr "Segui la preferenza di sistema"
+
+msgid "Built-in WordPress forms"
+msgstr "Moduli nativi di WordPress"
+
+msgid "Enable Gaitcha protection on WordPress built-in forms."
+msgstr "Attiva la protezione Gaitcha sui moduli nativi di WordPress."
+
+msgid "Login form"
+msgstr "Modulo di accesso"
+
+msgid "Registration form"
+msgstr "Modulo di registrazione"
+
+msgid "Lost password form"
+msgstr "Modulo password dimenticata"
+
+msgid "Comment form"
+msgstr "Modulo di commento"
+
+msgid "Error:"
+msgstr "Errore:"
+
+msgid "Comment Submission Error"
+msgstr "Errore nell'invio del commento"

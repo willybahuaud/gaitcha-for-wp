@@ -13,6 +13,7 @@ namespace GaitchaWP\Connectors;
 
 use Gaitcha\Config;
 use GaitchaWP\Endpoint;
+use GaitchaWP\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -153,7 +154,8 @@ class FormidableConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
+				'theme'        => Settings::get_theme(),
 			)
 		);
 

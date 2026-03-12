@@ -102,7 +102,7 @@ class NFFieldGaitcha extends \NF_Abstracts_Field {
 
 		$this->_nicename = __( 'Gaitcha', 'gaitcha-for-wp' );
 
-		$this->_settings['label']['value'] = __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
+		$this->_settings['label']['value'] = __( 'I\'m a real person', 'gaitcha-for-wp' );
 	}
 
 	/**

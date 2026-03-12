@@ -10,24 +10,8 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
-
-	/**
-	 * Reads the label from the container's data attribute.
-	 *
-	 * @param {HTMLElement} container The gaitcha container element.
-	 * @return {string} The label text, or the default label.
-	 */
-	function readFieldLabel(container) {
-		var label = container.getAttribute('data-gaitcha-label');
-
-		if (label && label.trim()) {
-			return label.trim();
-		}
-
-		return config.defaultLabel || '';
-	}
 
 	/**
 	 * Initializes Gaitcha on a single container element.
@@ -47,8 +31,9 @@
 
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
-			label: readFieldLabel(container),
-			container: container
+			label: config.defaultLabel || '',
+			container: container,
+			theme: config.theme || 'light'
 		});
 	}
 
@@ -75,4 +60,23 @@
 	// Re-scan after Formidable AJAX events (multi-page forms, form reset).
 	document.addEventListener('frmPageChanged', scanContainers);
 	document.addEventListener('frmFormComplete', scanContainers);
+
+	// Reset after validation errors.
+	// Formidable fires frmFormErrors (jQuery event) when server-side
+	// validation fails — the form stays in DOM with errors shown inline.
+	if (typeof jQuery !== 'undefined') {
+		/**
+		 * Resets Gaitcha after a Formidable validation error.
+		 *
+		 * @param {Object}      event  jQuery event object.
+		 * @param {jQuery}      $form  jQuery object of the form.
+		 * @param {Object}      errors Error object from Formidable.
+		 * @return {void}
+		 */
+		jQuery(document).on('frmFormErrors', function handleFormidableErrors(event, $form, errors) {
+			if ($form && $form.length) {
+				Gaitcha.reset($form[0]);
+			}
+		});
+	}
 })();

@@ -10,6 +10,8 @@
 
 namespace GaitchaWP\Connectors;
 
+use GaitchaWP\WidgetPreview;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -31,7 +33,7 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 		$this->group    = 'standard';
 
 		$this->default_settings = array(
-			'label'      => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+			'label'      => 'Gaitcha',
 			'label_hide' => '1',
 		);
 	}
@@ -44,7 +46,6 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 	 */
 	public function field_options( $field ) {
 		$this->field_option( 'basic-options', $field, array( 'markup' => 'open' ) );
-		$this->field_option( 'label', $field );
 		$this->field_option( 'description', $field );
 		$this->field_option( 'basic-options', $field, array( 'markup' => 'close' ) );
 
@@ -60,13 +61,10 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 	 * @return void
 	 */
 	public function field_preview( $field ) {
-		$label = ! empty( $field['label'] ) ? $field['label'] : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
-
 		echo '<div class="primary-input" style="padding:8px 0;">';
-		echo '<input type="checkbox" disabled style="margin-right:4px;vertical-align:middle;">';
-		echo '<label class="wpforms-field-label-inline" style="vertical-align:middle;">';
-		echo esc_html( $label );
-		echo '</label></div>';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WidgetPreview::render() handles escaping internally.
+		echo WidgetPreview::render();
+		echo '</div>';
 
 		$this->field_preview_option( 'description', $field );
 	}
@@ -85,15 +83,13 @@ class WPFormsFieldGaitcha extends \WPForms_Field {
 	public function field_display( $field, $deprecated, $form_data ) {
 		$form_id  = absint( $form_data['id'] );
 		$field_id = absint( $field['id'] );
-		$label    = ! empty( $field['label'] ) ? $field['label'] : '';
 
 		$container_id = 'wpforms-gaitcha-' . $form_id . '-' . $field_id;
 
 		printf(
-			'<div class="wpforms-gaitcha-container" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div>',
+			'<div class="wpforms-gaitcha-container" id="%s" data-gaitcha-container="%s"></div>',
 			esc_attr( $container_id ),
-			esc_attr( $container_id ),
-			esc_attr( $label )
+			esc_attr( $container_id )
 		);
 	}
 }

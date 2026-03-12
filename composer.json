@@ -5,7 +5,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=7.4",
-        "willybahuaud/gaitcha": "^0.5"
+        "willybahuaud/gaitcha": "^0.6"
     },
     "autoload": {
         "psr-4": {

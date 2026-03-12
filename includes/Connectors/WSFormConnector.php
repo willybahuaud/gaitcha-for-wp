@@ -13,6 +13,8 @@ namespace GaitchaWP\Connectors;
 use Gaitcha\Config;
 use Gaitcha\ValidationOrchestrator;
 use GaitchaWP\Endpoint;
+use GaitchaWP\Settings;
+use GaitchaWP\WidgetPreview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -77,9 +79,7 @@ class WSFormConnector implements ConnectorInterface {
 		$gaitcha_field = array(
 			'label'                => 'Gaitcha',
 			'label_default'        => 'Gaitcha',
-			'mask_field'                => '#pre_label<div id="#id" class="wsf-gaitcha-container" data-gaitcha-container="#id"#attributes></div>#post_label',
-			'mask_field_label'          => '<label id="#label_id" for="#id"#attributes>#label</label>',
-			'mask_field_label_attributes' => array( 'class' ),
+			'mask_field'                => '<div id="#id" class="wsf-gaitcha-container" data-gaitcha-container="#id"#attributes>' . WidgetPreview::render() . '</div>',
 			'mask_field_attributes' => array( 'class' ),
 			'submit_save'          => false,
 			'submit_edit'          => false,
@@ -97,7 +97,7 @@ class WSFormConnector implements ConnectorInterface {
 			'fieldsets'            => array(
 				'basic' => array(
 					'label'    => __( 'Basic', 'gaitcha-for-wp' ),
-					'meta_keys' => array( 'label_render', 'help' ),
+					'meta_keys' => array( 'help' ),
 				),
 				'advanced' => array(
 					'label'     => __( 'Advanced', 'gaitcha-for-wp' ),
@@ -169,7 +169,8 @@ class WSFormConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
+				'theme'        => Settings::get_theme(),
 			)
 		);
 	}

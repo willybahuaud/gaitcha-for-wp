@@ -10,7 +10,7 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
 
 	/**
@@ -48,7 +48,8 @@
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
-			container: container
+			container: container,
+			theme: config.theme || 'light'
 		});
 	}
 
@@ -74,4 +75,31 @@
 
 	// Re-scan after CF7 AJAX submission (CF7 replaces form HTML, new containers appear).
 	document.addEventListener('wpcf7submit', scanContainers);
+
+	/**
+	 * Resets Gaitcha after a CF7 validation error.
+	 *
+	 * CF7 does not replace the form DOM on validation failures
+	 * (wpcf7invalid, wpcf7spam, wpcf7mailfailed). The checkbox
+	 * stays checked with stale behavioral data and a potentially
+	 * consumed token — the user can't retry without a reset.
+	 *
+	 * @param {Event} event CF7 custom event on the form (6.x) or wrapper div (5.x).
+	 * @return {void}
+	 */
+	function handleValidationError(event) {
+		var target = event.target;
+		var form = target.tagName === 'FORM'
+			? target
+			: target.querySelector('form');
+
+		if (form) {
+			Gaitcha.reset(form);
+		}
+	}
+
+	// Reset after validation errors — form stays in DOM, needs fresh captcha.
+	document.addEventListener('wpcf7invalid', handleValidationError);
+	document.addEventListener('wpcf7spam', handleValidationError);
+	document.addEventListener('wpcf7mailfailed', handleValidationError);
 })();

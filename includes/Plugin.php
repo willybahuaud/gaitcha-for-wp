@@ -18,6 +18,8 @@ use GaitchaWP\Connectors\GravityFormsConnector;
 use GaitchaWP\Connectors\WPFormsConnector;
 use GaitchaWP\Connectors\FluentFormsConnector;
 use GaitchaWP\Connectors\NinjaFormsConnector;
+use GaitchaWP\Connectors\ElementorProConnector;
+use GaitchaWP\Connectors\NativeFormsConnector;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -74,6 +76,16 @@ class Plugin {
 		$this->endpoint = new Endpoint( $this->config );
 		$this->endpoint->register();
 
+		// Settings page (admin only).
+		if ( is_admin() ) {
+			$settings = new Settings();
+			$settings->register_hooks();
+		}
+
+		// Native WordPress forms (login, register, lost password, comments).
+		$native = new NativeFormsConnector( $this->config, $this->endpoint );
+		$native->register_hooks();
+
 		// WS Form connector.
 		if ( class_exists( 'WS_Form' ) ) {
 			$connector = new WSFormConnector( $this->config, $this->endpoint );
@@ -113,6 +125,12 @@ class Plugin {
 		// Ninja Forms connector.
 		if ( class_exists( 'Ninja_Forms' ) ) {
 			$connector = new NinjaFormsConnector( $this->config, $this->endpoint );
+			$connector->register_hooks();
+		}
+
+		// Elementor Pro Forms connector.
+		if ( did_action( 'elementor/loaded' ) && class_exists( 'ElementorPro\Plugin' ) ) {
+			$connector = new ElementorProConnector( $this->config, $this->endpoint );
 			$connector->register_hooks();
 		}
 

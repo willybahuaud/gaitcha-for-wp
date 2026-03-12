@@ -10,24 +10,8 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
-
-	/**
-	 * Reads the label from the container's data attribute.
-	 *
-	 * @param {HTMLElement} container The gaitcha container element.
-	 * @return {string} The label text, or the default label.
-	 */
-	function readFieldLabel(container) {
-		var label = container.getAttribute('data-gaitcha-label');
-
-		if (label && label.trim()) {
-			return label.trim();
-		}
-
-		return config.defaultLabel || '';
-	}
 
 	/**
 	 * Initializes Gaitcha on a single container element.
@@ -47,8 +31,9 @@
 
 		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
-			label: readFieldLabel(container),
-			container: container
+			label: config.defaultLabel || '',
+			container: container,
+			theme: config.theme || 'light'
 		});
 	}
 
@@ -72,8 +57,25 @@
 		scanContainers();
 	}
 
-	// Re-scan after GF AJAX form render (jQuery event, loaded by GF).
+	// Re-scan and reset after GF AJAX form render (jQuery event, loaded by GF).
+	// gform_post_render fires after validation errors AND successful submissions.
+	// Two scenarios:
+	// - GF replaces the entire form HTML: old instance is orphaned, scanContainers re-inits.
+	// - GF keeps the form element (injects errors inline): reset() clears the widget.
 	if (typeof jQuery !== 'undefined') {
-		jQuery(document).on('gform_post_render', scanContainers);
+		/**
+		 * Resets and re-initializes Gaitcha after a Gravity Forms AJAX render.
+		 *
+		 * @param {Object} event    jQuery event object.
+		 * @param {number} formId   The Gravity Forms form ID.
+		 * @return {void}
+		 */
+		jQuery(document).on('gform_post_render', function handleGFormPostRender(event, formId) {
+			var form = document.getElementById('gform_' + formId);
+			if (form) {
+				Gaitcha.reset(form);
+			}
+			scanContainers();
+		});
 	}
 })();

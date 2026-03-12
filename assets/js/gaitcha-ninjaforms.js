@@ -17,31 +17,11 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
 
 	/** @type {Array<HTMLElement>} Tracked gaitcha containers for AJAX injection. */
 	var trackedContainers = [];
-
-	/**
-	 * Reads the label from the container's data attribute.
-	 *
-	 * NF always sets the initial label to the field nicename ("Gaitcha")
-	 * regardless of PHP settingDefaults. Fall back to the configured
-	 * default when the label is empty or matches the nicename.
-	 *
-	 * @param {HTMLElement} container The gaitcha container element.
-	 * @return {string} The label text, or the default label.
-	 */
-	function readFieldLabel(container) {
-		var label = container.getAttribute('data-gaitcha-label');
-
-		if (label && label.trim() && label.trim().toLowerCase() !== 'gaitcha') {
-			return label.trim();
-		}
-
-		return config.defaultLabel || '';
-	}
 
 	/**
 	 * Initializes Gaitcha on a single container element.
@@ -59,9 +39,13 @@
 			return;
 		}
 
+		// Remove static preview placeholder injected by the Underscore template.
+		container.innerHTML = '';
+
 		Gaitcha.init(form, config.endpoint, {
-			label: readFieldLabel(container),
-			container: container
+			label: config.defaultLabel || '',
+			container: container,
+			theme: config.theme || 'light'
 		});
 
 		trackedContainers.push(container);
@@ -142,6 +126,49 @@
 
 				if (value) {
 					options.data += '&' + encodeURIComponent(input.name) + '=' + encodeURIComponent(value);
+				}
+			}
+		}
+	});
+
+	/**
+	 * Resets Gaitcha after a Ninja Forms validation error.
+	 *
+	 * NF shows errors via Backbone views without re-rendering the form.
+	 * Detect failed submissions from the AJAX response and reset.
+	 *
+	 * @param {Object} event    jQuery AJAX complete event.
+	 * @param {Object} xhr      The XMLHttpRequest object.
+	 * @param {Object} settings jQuery AJAX settings.
+	 * @return {void}
+	 */
+	jQuery(document).ajaxComplete(function handleNFAjaxComplete(event, xhr, settings) {
+		if (!settings || !settings.data || typeof settings.data !== 'string') {
+			return;
+		}
+
+		if (settings.data.indexOf('nf_ajax_submit') === -1) {
+			return;
+		}
+
+		var response;
+		try {
+			response = JSON.parse(xhr.responseText);
+		} catch (e) {
+			return;
+		}
+
+		// NF puts errors at response.errors (not response.data.errors).
+		var hasErrors = response
+			&& response.errors
+			&& typeof response.errors === 'object'
+			&& Object.keys(response.errors).length > 0;
+
+		if (hasErrors) {
+			for (var i = 0; i < trackedContainers.length; i++) {
+				var form = trackedContainers[i].closest('form');
+				if (form) {
+					Gaitcha.reset(form);
 				}
 			}
 		}

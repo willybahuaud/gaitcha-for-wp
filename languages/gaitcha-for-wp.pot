@@ -30,7 +30,7 @@ msgstr ""
 #: includes/Connectors/WPFormsConnector.php
 #: includes/Connectors/WPFormsFieldGaitcha.php
 #: includes/Connectors/WSFormConnector.php
-msgid "Yes, I'm a real person"
+msgid "I'm a real person"
 msgstr ""
 
 #: includes/Connectors/CF7Connector.php
@@ -109,4 +109,68 @@ msgstr ""
 
 #: includes/Updater.php
 msgid "No release notes available."
+msgstr ""
+
+#: includes/Settings.php
+msgid "Settings"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Gaitcha Settings"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Appearance"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Widget theme"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Light"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Dark"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Follow system preference"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Built-in WordPress forms"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Enable Gaitcha protection on WordPress built-in forms."
+msgstr ""
+
+#: includes/Settings.php
+msgid "Login form"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Registration form"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Lost password form"
+msgstr ""
+
+#: includes/Settings.php
+msgid "Comment form"
+msgstr ""
+
+#: includes/Connectors/NativeFormsConnector.php
+msgid "Error:"
+msgstr ""
+
+#: includes/Connectors/NativeFormsConnector.php
+msgid "Comment Submission Error"
+msgstr ""
+
+#: includes/Connectors/ElementorProConnector.php
+msgid "Gaitcha"
 msgstr ""

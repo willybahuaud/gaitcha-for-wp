@@ -14,6 +14,8 @@ namespace GaitchaWP\Connectors;
 use Gaitcha\Config;
 use Gaitcha\ValidationOrchestrator;
 use GaitchaWP\Endpoint;
+use GaitchaWP\Settings;
+use GaitchaWP\WidgetPreview;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -88,8 +90,11 @@ class NinjaFormsConnector implements ConnectorInterface {
 			<ul>
 				<li id="nf-gaitcha-{{ data.id }}"
 					class="nf-gaitcha-container"
-					data-gaitcha-container="nf-gaitcha-{{ data.id }}"
-					data-gaitcha-label="{{ _.escape( data.label ) }}">
+					data-gaitcha-container="nf-gaitcha-{{ data.id }}">
+					<?php
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WidgetPreview handles escaping.
+					echo WidgetPreview::render();
+					?>
 				</li>
 			</ul>
 		</script>
@@ -132,7 +137,8 @@ class NinjaFormsConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
+				'theme'        => Settings::get_theme(),
 			)
 		);
 	}

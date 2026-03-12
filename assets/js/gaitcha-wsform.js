@@ -10,32 +10,8 @@
 (function () {
 	'use strict';
 
-	/** @type {{ endpoint: string, defaultLabel: string }} */
+	/** @type {{ endpoint: string, defaultLabel: string, theme: string }} */
 	var config = window.gaitchaWPConfig || {};
-
-	/**
-	 * Reads the WS Form field label associated with a gaitcha container.
-	 *
-	 * WS Form renders a `<label for="#id">` via mask_field_label. The label's
-	 * "for" attribute matches the container's id.
-	 *
-	 * @param {HTMLElement} container The gaitcha container element.
-	 * @return {string} The label text, or the default label.
-	 */
-	function readFieldLabel(container) {
-		var fieldId = container.id;
-		if (fieldId) {
-			var wrapper = container.closest('.wsf-field-wrapper') || container.closest('form');
-			if (wrapper) {
-				var label = wrapper.querySelector('label[for="' + CSS.escape(fieldId) + '"]');
-				if (label && label.textContent.trim()) {
-					return { text: label.textContent.trim(), element: label };
-				}
-			}
-		}
-
-		return { text: config.defaultLabel || '', element: null };
-	}
 
 	/**
 	 * Initializes Gaitcha on a single container element.
@@ -53,17 +29,15 @@
 			return;
 		}
 
-		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
-		var labelData = readFieldLabel(container);
-		Gaitcha.init(form, config.endpoint, {
-			label: labelData.text,
-			container: container
-		});
+		// Remove static preview placeholder injected by mask_field.
+		container.innerHTML = '';
 
-		// Hide the WS Form label to avoid duplication with the gaitcha checkbox label.
-		if (labelData.element) {
-			labelData.element.style.display = 'none';
-		}
+		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
+		Gaitcha.init(form, config.endpoint, {
+			label: config.defaultLabel || '',
+			container: container,
+			theme: config.theme || 'light'
+		});
 	}
 
 	/**
@@ -112,5 +86,37 @@
 	// Listen for dynamically rendered WS Forms via jQuery event.
 	if (typeof jQuery !== 'undefined') {
 		jQuery(document).on('wsf-rendered', handleWsfRendered);
+
+		/**
+		 * Resets Gaitcha after a WS Form validation error.
+		 *
+		 * WS Form may show inline errors without triggering wsf-rendered.
+		 * The wsf-error event fires on validation failure.
+		 *
+		 * @param {Object} event      jQuery event object.
+		 * @param {Object} formObject WS Form object.
+		 * @return {void}
+		 */
+		jQuery(document).on('wsf-error', function handleWsfError(event, formObject) {
+			var formEl = null;
+
+			if (formObject && formObject.form_canvas_obj) {
+				formEl = formObject.form_canvas_obj.closest('form');
+			}
+
+			if (!formEl) {
+				// Fallback: reset all known gaitcha forms.
+				var containers = document.querySelectorAll('.wsf-gaitcha-container[data-gaitcha-container]');
+				containers.forEach(function forEachContainer(container) {
+					var form = container.closest('form');
+					if (form) {
+						Gaitcha.reset(form);
+					}
+				});
+				return;
+			}
+
+			Gaitcha.reset(formEl);
+		});
 	}
 })();

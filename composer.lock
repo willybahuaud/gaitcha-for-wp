@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec40747890749211a592f1107eaa2e97",
+    "content-hash": "d2d6e08bb2c36ededfb8aad5859e6d32",
     "packages": [
         {
             "name": "willybahuaud/gaitcha",
-            "version": "v0.5.1",
+            "version": "v0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/willybahuaud/gaitcha.git",
-                "reference": "0d425c2ce0324191fb926edf81bae19cced77ba5"
+                "reference": "83f0a4d79067168311db52abdecdff107fb9ff70"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willybahuaud/gaitcha/zipball/0d425c2ce0324191fb926edf81bae19cced77ba5",
-                "reference": "0d425c2ce0324191fb926edf81bae19cced77ba5",
+                "url": "https://api.github.com/repos/willybahuaud/gaitcha/zipball/83f0a4d79067168311db52abdecdff107fb9ff70",
+                "reference": "83f0a4d79067168311db52abdecdff107fb9ff70",
                 "shasum": ""
             },
             "require": {
@@ -46,9 +46,9 @@
             "description": "Frictionless, self-hosted CAPTCHA combining behavioral analysis, random field names, and HMAC tokens.",
             "support": {
                 "issues": "https://github.com/willybahuaud/gaitcha/issues",
-                "source": "https://github.com/willybahuaud/gaitcha/tree/v0.5.1"
+                "source": "https://github.com/willybahuaud/gaitcha/tree/v0.6.0"
             },
-            "time": "2026-03-09T11:03:03+00:00"
+            "time": "2026-03-12T00:17:03+00:00"
         }
     ],
     "packages-dev": [],

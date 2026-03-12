@@ -14,6 +14,7 @@ namespace GaitchaWP\Connectors;
 use Gaitcha\Config;
 use Gaitcha\ValidationOrchestrator;
 use GaitchaWP\Endpoint;
+use GaitchaWP\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -59,9 +60,24 @@ class FluentFormsConnector implements ConnectorInterface {
 	 */
 	public function register_hooks(): void {
 		add_filter( 'fluentform/editor_components', array( $this, 'register_component' ) );
+		add_filter( 'fluentform/form_input_types', array( $this, 'register_input_type' ) );
 		add_action( 'fluentform/render_item_' . self::ELEMENT, array( $this, 'render_field' ), 10, 2 );
 		add_filter( 'fluentform/validate_input_item_' . self::ELEMENT, array( $this, 'validate_field' ), 10, 5 );
 		add_filter( 'fluentform/rendering_form', array( $this, 'maybe_enqueue_scripts' ) );
+	}
+
+	/**
+	 * Registers gaitcha as a known input type for the form parser.
+	 *
+	 * Without this, the Extractor skips the gaitcha element entirely
+	 * and neither field-level nor form-level validation hooks fire.
+	 *
+	 * @param array $types Registered input types.
+	 * @return array Modified input types.
+	 */
+	public function register_input_type( $types ) {
+		$types[] = self::ELEMENT;
+		return $types;
 	}
 
 	/**
@@ -80,7 +96,7 @@ class FluentFormsConnector implements ConnectorInterface {
 			),
 			'settings'       => array(
 				'label'            => __( 'Gaitcha', 'gaitcha-for-wp' ),
-				'tnc_html'         => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'tnc_html'         => __( 'I\'m a real person', 'gaitcha-for-wp' ),
 				'has_checkbox'     => true,
 				'help_message'     => '',
 				'container_class'  => '',
@@ -105,7 +121,6 @@ class FluentFormsConnector implements ConnectorInterface {
 	 */
 	public function render_field( $data, $form ) {
 		$form_id      = absint( $form->id );
-		$label        = ! empty( $data['settings']['tnc_html'] ) ? $data['settings']['tnc_html'] : '';
 		$container_id = 'ff-gaitcha-' . $form_id;
 
 		$container_class = 'ff-el-group';
@@ -114,16 +129,19 @@ class FluentFormsConnector implements ConnectorInterface {
 		}
 
 		printf(
-			'<div class="%s"><div class="ff-el-input--content"><div class="ff-el-form-check" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div></div></div>',
+			'<div class="%s"><div class="ff-el-input--content"><div class="ff-el-form-check" id="%s" data-gaitcha-container="%s"></div></div></div>',
 			esc_attr( $container_class ),
 			esc_attr( $container_id ),
-			esc_attr( $container_id ),
-			esc_attr( $label )
+			esc_attr( $container_id )
 		);
 	}
 
 	/**
 	 * Validates the gaitcha field on form submission.
+	 *
+	 * Requires register_input_type() to run first — without it,
+	 * the FF parser excludes gaitcha from $fields and this hook
+	 * never fires.
 	 *
 	 * @param string $error    Existing error.
 	 * @param array  $field    Field config.
@@ -139,9 +157,21 @@ class FluentFormsConnector implements ConnectorInterface {
 			return $error;
 		}
 
-		$orchestrator = new ValidationOrchestrator( $this->config );
+		// FF sends form inputs inside $_POST['data'] as a URL-encoded string.
+		// The $formData param is already parsed by FF (parse_str), but may
+		// not include gaitcha hidden fields if FF filters by registered elements.
+		// Parse $_POST['data'] ourselves as a reliable fallback.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Gaitcha uses HMAC token validation, not nonces.
-		$result       = $orchestrator->validate( wp_unslash( $_POST ) );
+		$post_data = array();
+		if ( ! empty( $_POST['data'] ) && is_string( $_POST['data'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Parsed then passed to HMAC validation.
+			parse_str( wp_unslash( $_POST['data'] ), $post_data );
+		} else {
+			$post_data = wp_unslash( $_POST );
+		}
+
+		$orchestrator = new ValidationOrchestrator( $this->config );
+		$result       = $orchestrator->validate( $post_data );
 
 		if ( ! $result->isAccepted() ) {
 			return __( 'Verification failed. Please try again.', 'gaitcha-for-wp' );
@@ -181,7 +211,8 @@ class FluentFormsConnector implements ConnectorInterface {
 			'gaitchaWPConfig',
 			array(
 				'endpoint'     => $this->endpoint->get_url(),
-				'defaultLabel' => __( 'Yes, I\'m a real person', 'gaitcha-for-wp' ),
+				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
+				'theme'        => Settings::get_theme(),
 			)
 		);
 

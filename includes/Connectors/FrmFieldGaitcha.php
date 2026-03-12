@@ -10,6 +10,8 @@
 
 namespace GaitchaWP\Connectors;
 
+use GaitchaWP\WidgetPreview;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -77,8 +79,8 @@ class FrmFieldGaitcha extends \FrmFieldType {
 	 */
 	public function show_on_form_builder( $name = '' ) {
 		echo '<div class="frm_html_field_placeholder">';
-		echo '<span class="frmfont frm_shield_check2_icon"></span> ';
-		echo esc_html__( 'Gaitcha captcha will appear here', 'gaitcha-for-wp' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WidgetPreview::render() handles escaping internally.
+		echo WidgetPreview::render();
 		echo '</div>';
 	}
 
@@ -91,14 +93,11 @@ class FrmFieldGaitcha extends \FrmFieldType {
 	 */
 	public function front_field_input( $args, $shortcode_atts ) {
 		$field_id = 'frm-gaitcha-' . absint( $this->get_field_column( 'id' ) );
-		$name     = $this->get_field_column( 'name' );
-		$label    = ! empty( $name ) && 'Gaitcha' !== $name ? $name : __( 'Yes, I\'m a real person', 'gaitcha-for-wp' );
 
 		return sprintf(
-			'<div class="frm_opt_container"><div class="frm-gaitcha-container" id="%s" data-gaitcha-container="%s" data-gaitcha-label="%s"></div></div>',
+			'<div class="frm_opt_container"><div class="frm-gaitcha-container" id="%s" data-gaitcha-container="%s"></div></div>',
 			esc_attr( $field_id ),
-			esc_attr( $field_id ),
-			esc_attr( $label )
+			esc_attr( $field_id )
 		);
 	}
 
