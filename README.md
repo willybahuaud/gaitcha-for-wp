@@ -146,6 +146,10 @@ composer install
 
 The core Gaitcha library is pulled via Composer (`willybahuaud/gaitcha`). The JS client (`assets/js/gaitcha.min.js`) is a pre-built bundle from the core library.
 
+## Core library
+
+This plugin is built on [Gaitcha](https://github.com/willybahuaud/gaitcha) — the standalone PHP + JS captcha library. If you're not on WordPress or want to integrate Gaitcha into a custom stack, head there.
+
 ## License
 
 GPL-2.0-or-later
