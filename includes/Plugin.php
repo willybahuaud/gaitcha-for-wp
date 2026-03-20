@@ -51,9 +51,11 @@ class Plugin {
 
 		$secret = get_option( 'gaitcha_secret', '' );
 
-		// Bail silently if the secret is too short (plugin not activated properly).
+		// Generate the secret on-the-fly if missing (multisite: activation
+		// hook only fires on the main site, so subsites need this fallback).
 		if ( strlen( $secret ) < 32 ) {
-			return;
+			$secret = wp_generate_password( 64, false, false );
+			add_option( 'gaitcha_secret', $secret, '', false );
 		}
 
 		$options = apply_filters(
