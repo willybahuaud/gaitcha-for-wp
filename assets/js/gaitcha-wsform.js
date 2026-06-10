@@ -24,19 +24,28 @@
 			return;
 		}
 
+		// Guard par container : le re-scan (wsf-rendered) repasserait par
+		// innerHTML = '' et effacerait le placeholder injecte par le core.
+		// Gaitcha.init() est double-init safe pour le form, pas pour ca.
+		if (container.hasAttribute('data-gaitcha-bound')) {
+			return;
+		}
+
 		var form = container.closest('form');
 		if (!form) {
 			return;
 		}
 
+		container.setAttribute('data-gaitcha-bound', '1');
+
 		// Remove static preview placeholder injected by mask_field.
 		container.innerHTML = '';
 
-		// Gaitcha.init() is double-init safe (checks data-gaitcha-initialized).
 		Gaitcha.init(form, config.endpoint, {
 			label: config.defaultLabel || '',
 			container: container,
-			theme: config.theme || 'light'
+			theme: config.theme || 'light',
+			style: config.style || 'default'
 		});
 	}
 

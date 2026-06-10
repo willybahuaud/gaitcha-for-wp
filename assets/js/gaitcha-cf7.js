@@ -49,7 +49,8 @@
 		Gaitcha.init(form, config.endpoint, {
 			label: readFieldLabel(container),
 			container: container,
-			theme: config.theme || 'light'
+			theme: config.theme || 'light',
+			style: config.style || 'default'
 		});
 	}
 

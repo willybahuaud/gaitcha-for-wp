@@ -61,12 +61,16 @@ The plugin checks GitHub Releases for new versions and integrates with the WordP
 
 Go to **Settings > Gaitcha** in the WordPress admin. Two sections:
 
-**Theme** — controls the widget appearance.
+**Theme** — controls the widget ambiance.
 - `light` (default) — light background, dark text
 - `dark` — dark background, light text
 - `auto` — follows the visitor's OS preference via `prefers-color-scheme`
 
-The theme applies to all Gaitcha widgets across every connector.
+**Style** — controls the widget visual language.
+- `default` — soft radii, subtle shadows, colored accents
+- `minimal` — sober monochrome: hairline borders, square corners, no shadows. Made for editorial and high-end site designs
+
+Theme and style combine freely and apply to all Gaitcha widgets across every connector.
 
 **Native form protections** — toggle Gaitcha on WordPress built-in forms (login, registration, lost password, comments). All off by default.
 

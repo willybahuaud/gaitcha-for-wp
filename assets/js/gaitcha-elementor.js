@@ -40,7 +40,8 @@
 		Gaitcha.init(form, config.endpoint, {
 			label: config.defaultLabel || '',
 			container: container,
-			theme: config.theme || 'light'
+			theme: config.theme || 'light',
+			style: config.style || 'default'
 		});
 	}
 

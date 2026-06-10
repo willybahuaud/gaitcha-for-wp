@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] — 2026-06-10
+
+### Added
+- "Widget style" setting (Settings > Gaitcha > Appearance): Default or Minimal. Minimal is a sober monochrome variant — 2px radii, hairline borders, no shadows, ink-on-paper checked state — designed to blend into editorial and high-end sites. Combines freely with all themes (light/dark/auto)
+- Builder previews (GF, WPForms, Formidable, Ninja Forms, WS Form, Elementor Pro) reflect the configured style
+
+### Changed
+- Core dependency bumped to `willybahuaud/gaitcha ^0.8`
+
+### Fixed
+- **Regression in 1.2.0** — Ninja Forms and WS Form: the widget never appeared. `initOnContainer` can run twice (mutation observer + DOM scan, or re-render events); since the core injects a placeholder at init time, the second call's `innerHTML = ''` wiped it. Containers are now guarded with a `data-gaitcha-bound` attribute
+
 ## [1.2.0] — 2026-06-10
 
 ### Added

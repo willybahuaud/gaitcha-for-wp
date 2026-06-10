@@ -143,6 +143,7 @@ class GravityFormsConnector implements ConnectorInterface {
 				'endpoint'     => $this->endpoint->get_url(),
 				'defaultLabel' => __( 'I\'m a real person', 'gaitcha-for-wp' ),
 				'theme'        => Settings::get_theme(),
+				'style'        => Settings::get_style(),
 			)
 		);
 	}
