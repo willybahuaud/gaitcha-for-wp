@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Ninja Forms: form could never be resubmitted after a first attempt without checking the captcha (#2). NF kept a stale error on the gaitcha field in its Backbone model — the gaitcha checkbox lives outside that model, so checking it never lifted the error and NF blocked the resubmission client-side. The adapter now clears the field errors when the widget gets checked
+
 ## [1.1.0] — 2026-03-12
 
 ### Added
