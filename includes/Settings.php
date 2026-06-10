@@ -38,6 +38,7 @@ class Settings {
 	 */
 	const DEFAULTS = array(
 		'theme'              => 'light',
+		'style'              => 'default',
 		'protect_login'      => false,
 		'protect_register'   => false,
 		'protect_lostpassword' => false,
@@ -119,6 +120,14 @@ class Settings {
 			'gaitcha_appearance'
 		);
 
+		add_settings_field(
+			'gaitcha_style',
+			__( 'Widget style', 'gaitcha-for-wp' ),
+			array( $this, 'render_style_field' ),
+			self::PAGE_SLUG,
+			'gaitcha_appearance'
+		);
+
 		// Native forms section.
 		add_settings_section(
 			'gaitcha_native_forms',
@@ -163,6 +172,11 @@ class Settings {
 			? $input['theme']
 			: 'light';
 
+		$valid_styles   = array( 'default', 'minimal' );
+		$clean['style'] = in_array( $input['style'] ?? '', $valid_styles, true )
+			? $input['style']
+			: 'default';
+
 		$checkboxes = array( 'protect_login', 'protect_register', 'protect_lostpassword', 'protect_comments' );
 		foreach ( $checkboxes as $key ) {
 			$clean[ $key ] = ! empty( $input[ $key ] );
@@ -190,6 +204,30 @@ class Settings {
 				'<option value="%s"%s>%s</option>',
 				esc_attr( $value ),
 				selected( $settings['theme'], $value, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</select>';
+	}
+
+	/**
+	 * Renders the style select field.
+	 *
+	 * @return void
+	 */
+	public function render_style_field() {
+		$settings = self::get_settings();
+		$options  = array(
+			'default' => __( 'Default — soft radii, subtle shadows, colored accents', 'gaitcha-for-wp' ),
+			'minimal' => __( 'Minimal — sober monochrome, for editorial and high-end sites', 'gaitcha-for-wp' ),
+		);
+
+		echo '<select name="' . esc_attr( self::OPTION_NAME ) . '[style]" id="gaitcha_style">';
+		foreach ( $options as $value => $label ) {
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $value ),
+				selected( $settings['style'], $value, false ),
 				esc_html( $label )
 			);
 		}
@@ -266,6 +304,17 @@ class Settings {
 		$settings = self::get_settings();
 
 		return $settings['theme'];
+	}
+
+	/**
+	 * Returns the configured widget style.
+	 *
+	 * @return string 'default' or 'minimal'.
+	 */
+	public static function get_style() {
+		$settings = self::get_settings();
+
+		return $settings['style'];
 	}
 
 	/**

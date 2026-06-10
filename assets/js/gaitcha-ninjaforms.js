@@ -108,10 +108,20 @@
 			return;
 		}
 
+		// Guard par container : initOnContainer peut etre appele deux fois
+		// (MutationObserver + scan DOMContentLoaded). Depuis que le core
+		// injecte un placeholder des l'init, le innerHTML = '' d'un second
+		// appel effacerait le widget.
+		if (container.hasAttribute('data-gaitcha-bound')) {
+			return;
+		}
+
 		var form = container.closest('form');
 		if (!form) {
 			return;
 		}
+
+		container.setAttribute('data-gaitcha-bound', '1');
 
 		// Remove static preview placeholder injected by the Underscore template.
 		container.innerHTML = '';
@@ -119,7 +129,8 @@
 		Gaitcha.init(form, config.endpoint, {
 			label: config.defaultLabel || '',
 			container: container,
-			theme: config.theme || 'light'
+			theme: config.theme || 'light',
+			style: config.style || 'default'
 		});
 
 		watchCheckToClearErrors(container);

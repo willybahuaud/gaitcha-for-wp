@@ -7,7 +7,7 @@ Plugin WordPress connecteur pour [Gaitcha](https://github.com/willybahuaud/gaitc
 ```
 gaitcha-for-wp/
 ├── gaitcha-for-wp.php              # Entry point, constantes, activation/deactivation
-├── composer.json                   # Dependance willybahuaud/gaitcha ^0.7, PSR-4
+├── composer.json                   # Dependance willybahuaud/gaitcha ^0.8, PSR-4
 ├── assets/js/
 │   ├── gaitcha.min.js              # Core JS (build depuis gaitcha)
 │   ├── gaitcha-cf7.js              # Adapter JS pour Contact Form 7
@@ -66,6 +66,7 @@ Lien "Reglages" dans la liste des plugins.
 
 ### Cles
 - `theme` — `'light'` (defaut), `'dark'`, `'auto'`
+- `style` — `'default'` (defaut), `'minimal'` (sobre monochrome)
 - `protect_login` — bool
 - `protect_register` — bool
 - `protect_lostpassword` — bool
@@ -74,6 +75,7 @@ Lien "Reglages" dans la liste des plugins.
 ### Acces statique
 - `Settings::get_settings()` — Retourne le tableau complet
 - `Settings::get_theme()` — Retourne le theme courant
+- `Settings::get_style()` — Retourne le style courant (default/minimal)
 - `Settings::is_protected($key)` — Verifie si une protection est activee
 
 ## Hooks exposes

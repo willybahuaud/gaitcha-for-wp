@@ -42,9 +42,18 @@ class WidgetPreview {
 
 		$label_attr_str = $label_attr ? ' ' . $label_attr : '';
 
-		return '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,\'Helvetica Neue\',Arial,sans-serif;background:#fff;border:1.5px solid #e2e6ea;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05);padding:14px 16px 12px;max-width:260px;display:flex;align-items:center;gap:11px;box-sizing:border-box;line-height:1;">'
+		// Refleter le style configure (Reglages > Gaitcha) dans le builder.
+		$is_minimal = 'minimal' === Settings::get_style();
+
+		$widget_border = $is_minimal ? '1px solid #1a1a1a' : '1.5px solid #e2e6ea';
+		$widget_radius = $is_minimal ? '2px' : '10px';
+		$widget_shadow = $is_minimal ? 'none' : '0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05)';
+		$box_border    = $is_minimal ? '1px solid #1a1a1a' : '1.5px solid #e2e6ea';
+		$box_radius    = $is_minimal ? '2px' : '5px';
+
+		return '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,\'Helvetica Neue\',Arial,sans-serif;background:#fff;border:' . $widget_border . ';border-radius:' . $widget_radius . ';box-shadow:' . $widget_shadow . ';padding:14px 16px 12px;max-width:260px;display:flex;align-items:center;gap:11px;box-sizing:border-box;line-height:1;">'
 			// Checkbox visual.
-			. '<div style="width:22px;height:22px;min-width:22px;border-radius:5px;border:1.5px solid #e2e6ea;background:#fff;box-sizing:border-box;"></div>'
+			. '<div style="width:22px;height:22px;min-width:22px;border-radius:' . $box_radius . ';border:' . $box_border . ';background:#fff;box-sizing:border-box;"></div>'
 			// Content section.
 			. '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow:hidden;">'
 			// Label.
