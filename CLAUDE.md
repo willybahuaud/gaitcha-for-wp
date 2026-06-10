@@ -7,7 +7,7 @@ Plugin WordPress connecteur pour [Gaitcha](https://github.com/willybahuaud/gaitc
 ```
 gaitcha-for-wp/
 ├── gaitcha-for-wp.php              # Entry point, constantes, activation/deactivation
-├── composer.json                   # Dependance wabeo/gaitcha ^0.5, PSR-4
+├── composer.json                   # Dependance willybahuaud/gaitcha ^0.7, PSR-4
 ├── assets/js/
 │   ├── gaitcha.min.js              # Core JS (build depuis gaitcha)
 │   ├── gaitcha-cf7.js              # Adapter JS pour Contact Form 7
@@ -23,7 +23,7 @@ gaitcha-for-wp/
 └── includes/                       # PSR-4: GaitchaWP\ (fichiers nommes par classe)
     ├── Plugin.php                  # Orchestrateur (Config, Endpoint, Connectors)
     ├── Settings.php                # Page de reglages (theme, formulaires natifs)
-    ├── Endpoint.php                # REST POST /wp-json/gaitcha/v1/init
+    ├── Endpoint.php                # REST POST /wp-json/gaitcha/v1/init (2 phases : pow_challenge puis token)
     ├── Updater.php                 # Auto-update via GitHub Releases
     ├── WPTokenStore.php            # Anti-replay via wp_options
     └── Connectors/                 # PSR-4: GaitchaWP\Connectors\
@@ -79,18 +79,20 @@ Lien "Reglages" dans la liste des plugins.
 ## Hooks exposes
 
 ### Filtres
-- `gaitcha_config` — Modifier les options Config (secret, debug, ttl, anti_replay...)
+- `gaitcha_config` — Modifier les options Config (secret, debug, ttl, anti_replay, pow, pow_difficulty, pow_challenge_ttl...)
 - `gaitcha_bypass_admin` — Bypass pour admins (defaut: manage_options)
 
 ## Flux d'integration Gaitcha
 
-1. **Client** : `gaitcha.min.js` detecte interaction → fetch token via `/gaitcha/v1/init`
-2. **Endpoint** : genere token HMAC + fieldName aleatoire
-3. **Check** : le JS serialise le log comportemental au moment du check (pas au submit)
-4. **Submit** : les hidden fields (token + log) sont envoyes avec le formulaire
-5. **Validation** : `ValidationOrchestrator->validate(wp_unslash($_POST))` verifie token + score comportemental
-6. **Anti-replay** : le token est consomme uniquement si la soumission est acceptee
-7. **Resultat** : accepted/rejected selon seuil (defaut 0.5)
+1. **Placeholder** : widget pending injecte au chargement (memes dimensions, non interactif, rien a scraper)
+2. **Client** : `gaitcha.min.js` detecte interaction → fetch via `/gaitcha/v1/init`
+3. **PoW** : l'endpoint repond `{ pow_challenge }` → resolution en Web Worker → nouvel appel avec la solution. Nonce consomme via WPTokenStore (anti-replay)
+4. **Endpoint** : genere token HMAC + fieldName aleatoire
+5. **Check** : le JS serialise le log comportemental au moment du check (pas au submit)
+6. **Submit** : les hidden fields (token + log) sont envoyes avec le formulaire
+7. **Validation** : `ValidationOrchestrator->validate(wp_unslash($_POST))` verifie token + score comportemental
+8. **Anti-replay** : le token est consomme uniquement si la soumission est acceptee
+9. **Resultat** : accepted/rejected selon seuil (defaut 0.5)
 
 ## Ajouter un connecteur
 

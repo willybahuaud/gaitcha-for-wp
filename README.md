@@ -75,8 +75,8 @@ The theme applies to all Gaitcha widgets across every connector.
 Each form plugin gets a **Gaitcha** field type in its builder. Add it to your form, publish, done.
 
 On the frontend:
-1. The form loads normally — no captcha visible
-2. As soon as the user moves the mouse, touches the screen, or presses a key, a checkbox fades in
+1. The form loads with a dimmed, non-interactive placeholder — the visitor knows a verification step exists, and nothing shifts around later. The placeholder exposes nothing: no field name, no token
+2. As soon as the user moves the mouse, touches the screen, or presses a key, the client solves a proof-of-work challenge in a background Web Worker (a brief spinner shows), then the placeholder becomes the real checkbox
 3. The user checks the box — behavioral data is collected silently in the background
 4. On submit, the server scores the behavior and accepts or rejects
 
@@ -126,11 +126,23 @@ add_filter( 'gaitcha_config', function ( $config ) {
 } );
 ```
 
-Available options: `secret`, `ttl`, `score_threshold`, `debug`, `no_js_fallback`, `anti_replay`, `token_store`.
+Available options: `secret`, `ttl`, `score_threshold`, `debug`, `no_js_fallback`, `anti_replay`, `token_store`, `pow`, `pow_difficulty`, `pow_challenge_ttl`.
+
+Proof of work is enabled by default. To tune or disable it:
+
+```php
+add_filter( 'gaitcha_config', function ( $config ) {
+    $config['pow_difficulty'] = 20;    // Harder challenges if you're under attack (default: 18).
+    // $config['pow'] = false;         // Or disable the PoW layer entirely.
+    return $config;
+} );
+```
 
 ## How It Works
 
-Gaitcha combines two layers:
+Gaitcha combines three layers:
+
+**Proof of work** — before the server hands out anything (the random field name, the signed token), the client must solve an HMAC-signed computational challenge. A human's browser does it invisibly in a background worker (~100–500 ms); a bot farm harvesting thousands of tokens pays real CPU time for each one. Each solved challenge is consumed on first use (anti-replay), so one solution = one token.
 
 **Behavioral analysis** — the JS client collects interaction data in a circular buffer: mouse trajectory curvature, angular jitter, direction reversals, endpoint deceleration, speed autocorrelation, keyboard dwell times, tab timing entropy, touch offset patterns. Three profiles (mouse, keyboard, touch) are scored independently; the highest wins. Touch scoring has been refined for mobile — pressure, radius, and gesture dynamics are now factored into the touch profile.
 
