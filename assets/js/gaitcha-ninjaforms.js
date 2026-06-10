@@ -24,6 +24,80 @@
 	var trackedContainers = [];
 
 	/**
+	 * Removes all errors from a Ninja Forms field model.
+	 *
+	 * @param {number} fieldId NF field id.
+	 * @return {void}
+	 */
+	function clearNFFieldErrors(fieldId) {
+		if (typeof nfRadio === 'undefined') {
+			return;
+		}
+
+		var fieldsChannel = nfRadio.channel('fields');
+		var field = fieldsChannel.request('get:field', fieldId);
+
+		if (!field) {
+			return;
+		}
+
+		var errors = field.get('errors');
+
+		if (!errors || !errors.length) {
+			return;
+		}
+
+		var errorIds = errors.map(function getErrorId(error) {
+			return error.get('id') || error.id;
+		});
+
+		for (var i = 0; i < errorIds.length; i++) {
+			fieldsChannel.request('remove:error', fieldId, errorIds[i]);
+		}
+	}
+
+	/**
+	 * Lifts stale NF field errors when the user checks the widget.
+	 *
+	 * After a rejected submission, NF marks the gaitcha field as errored
+	 * in its Backbone model. The gaitcha checkbox lives outside that
+	 * model, so checking it never updates the field — and NF blocks any
+	 * resubmission client-side while a field has errors. We watch for
+	 * the widget checked state and clear the field errors so the user
+	 * can resubmit.
+	 *
+	 * @param {HTMLElement} container The gaitcha container (id: nf-gaitcha-{fieldId}).
+	 * @return {void}
+	 */
+	function watchCheckToClearErrors(container) {
+		var fieldId = parseInt(String(container.id || '').replace('nf-gaitcha-', ''), 10);
+
+		if (!fieldId) {
+			return;
+		}
+
+		var wasChecked = false;
+
+		var checkObserver = new MutationObserver(function handleWidgetStateChange() {
+			var checked = !!container.querySelector('.gaitcha-widget--checked');
+
+			// Ne purger qu'a la transition unchecked -> checked (le widget
+			// repasse par unchecked apres un Gaitcha.reset()).
+			if (checked && !wasChecked) {
+				clearNFFieldErrors(fieldId);
+			}
+			wasChecked = checked;
+		});
+
+		checkObserver.observe(container, {
+			attributes: true,
+			attributeFilter: ['class'],
+			childList: true,
+			subtree: true
+		});
+	}
+
+	/**
 	 * Initializes Gaitcha on a single container element.
 	 *
 	 * @param {HTMLElement} container The gaitcha container rendered by NF.
@@ -47,6 +121,8 @@
 			container: container,
 			theme: config.theme || 'light'
 		});
+
+		watchCheckToClearErrors(container);
 
 		trackedContainers.push(container);
 	}
