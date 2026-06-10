@@ -49,11 +49,17 @@ class Endpoint extends AbstractEndpoint {
 	/**
 	 * Handles the REST request and returns token data.
 	 *
+	 * The decoded JSON body is forwarded to the core: with proof of work
+	 * enabled, the endpoint answers a pow_challenge until a valid
+	 * solution is submitted, then issues the token.
+	 *
 	 * @param WP_REST_Request $request Incoming request.
 	 * @return WP_REST_Response
 	 */
 	public function handle_request( WP_REST_Request $request ) {
-		return new WP_REST_Response( $this->handleInit(), 200 );
+		$body = $request->get_json_params();
+
+		return new WP_REST_Response( $this->handleInit( is_array( $body ) ? $body : array() ), 200 );
 	}
 
 	/**

@@ -59,9 +59,13 @@ class Plugin {
 		$options = apply_filters(
 			'gaitcha_config',
 			array(
-				'secret'       => $secret,
-				'debug'        => defined( 'WP_DEBUG' ) && WP_DEBUG,
-				'anti_replay'  => true,
+				'secret'      => $secret,
+				'debug'       => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'anti_replay' => true,
+				// Proof of work avant l'emission du token. Active par defaut :
+				// le JS et l'endpoint sont livres ensemble dans le plugin, pas
+				// de risque de desynchronisation. Desactivable via le filtre.
+				'pow'         => true,
 			)
 		);
 

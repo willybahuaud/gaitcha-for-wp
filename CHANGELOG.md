@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.2.0] — 2026-06-10
+
+### Added
+- Proof-of-work layer enabled by default: the init endpoint requires a solved HMAC-signed challenge before issuing tokens (core gaitcha 0.7.0). Tunable or disableable via the `gaitcha_config` filter (`pow`, `pow_difficulty`, `pow_challenge_ttl`)
+- Placeholder widget visible at page load: same dimensions as the final captcha (zero layout shift), dimmed and non-interactive, exposes no field name or token
+- Challenge nonces are consumed through `WPTokenStore` (anti-replay was already on by default): one solved challenge = one token
+
+### Changed
+- REST endpoint forwards the decoded JSON request body to the core `handleInit()` (two-phase init: challenge, then token)
+- Core dependency bumped to `willybahuaud/gaitcha ^0.7`
+- Core JS bundle updated (PoW solver in Blob-based Web Worker with main-thread fallback, pending widget state)
 
 ### Fixed
 - Ninja Forms: form could never be resubmitted after a first attempt without checking the captcha (#2). NF kept a stale error on the gaitcha field in its Backbone model — the gaitcha checkbox lives outside that model, so checking it never lifted the error and NF blocked the resubmission client-side. The adapter now clears the field errors when the widget gets checked
