@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] — 2026-07-16
+
+### Fixed
+- Gravity Forms: the field was labeled "Untitled" in the form editor with no way to edit or hide it. The label now defaults to "Gaitcha", is editable (Label setting) and hideable (Field Label Visibility, Appearance tab) — same settings as the native GF captcha field
+
 ## [1.3.0] — 2026-06-10
 
 ### Added

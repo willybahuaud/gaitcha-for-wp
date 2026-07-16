@@ -83,10 +83,34 @@ class GFFieldGaitcha extends \GF_Field {
 	 */
 	public function get_form_editor_field_settings() {
 		return array(
+			'label_setting',
+			'label_placement_setting',
 			'description_setting',
 			'css_class_setting',
 			'conditional_logic_field_setting',
 			'error_message_setting',
+		);
+	}
+
+	/**
+	 * Returns inline JS for the form editor to set the default field label.
+	 *
+	 * Without this, GF's SetDefaultValues() default case labels the field
+	 * "Untitled" ("Sans titre"). SetDefaultValues_gaitcha() runs right after
+	 * and replaces it, but only if the label is empty or still the GF default,
+	 * so a custom label survives field duplication.
+	 *
+	 * @return string JS snippet output by form_detail.php in the editor.
+	 */
+	public function get_form_editor_inline_script_on_page_render() {
+		return sprintf(
+			'function SetDefaultValues_%s( field ) {'
+			. ' if ( ! field.label || field.label === %s ) { field.label = %s; }'
+			. ' return field;'
+			. ' }',
+			$this->type,
+			wp_json_encode( esc_html__( 'Untitled', 'gravityforms' ) ),
+			wp_json_encode( 'Gaitcha' )
 		);
 	}
 
