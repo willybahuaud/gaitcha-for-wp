@@ -2,17 +2,11 @@
 
 [English](README.md) · Français
 
-Gaitcha ajoute une case de captcha aux formulaires WordPress. L'extension évalue le journal d'interaction sur ton serveur WordPress et exige une preuve de travail par défaut. Tu n'as pas besoin de compte ni de clé API auprès d'un fournisseur de captcha.
+Gaitcha ajoute une case de captcha aux formulaires WordPress, avec une vérification sur ton propre serveur. Le visiteur coche une case plutôt que de résoudre une grille d'images. Tu installes l'extension et tu ajoutes un champ à ton formulaire, sans compte à créer ni clé API à récupérer.
 
 [Site](https://gaitcha.com/fr/) · [Démo](https://gaitcha.com/fr/#try-it) · [Guide WordPress](https://gaitcha.com/fr/wordpress/) · [Dépannage](https://gaitcha.com/fr/guides/troubleshooting/)
 
-## Avant l'installation
-
-Gaitcha évalue les données de souris, de clavier et de tactile fournies par le navigateur. Un script peut obtenir un jeton, résoudre le calcul demandé et envoyer un journal fabriqué sans exécuter de navigateur. Une vérification réussie ne prouve pas que le visiteur est humain.
-
-La preuve de travail ajoute un coût de calcul. Aucun taux de détection n'est publié pour Gaitcha, qui ne remplace ni la limitation de débit, ni la validation des champs, ni les protections de connexion. Teste les formulaires avec les modes de saisie de tes visiteurs et prévois une nouvelle tentative après un rejet.
-
-La [bibliothèque autonome](https://github.com/willybahuaud/gaitcha) documente le protocole de vérification. Ce dépôt fournit son intégration WordPress.
+L'extension fournit des connecteurs pour huit constructeurs de formulaires, une protection optionnelle des formulaires natifs WordPress et des réglages d'apparence clairs, sombres ou minimalistes. Elle utilise la [bibliothèque PHP Gaitcha](https://github.com/willybahuaud/gaitcha) pour le score comportemental, avec la preuve de travail active par défaut.
 
 ## Installation
 
@@ -42,9 +36,7 @@ Les connecteurs se chargent quand l'extension de formulaire correspondante est a
 
 Guides détaillés : [Contact Form 7](https://gaitcha.com/fr/guides/contact-form-7/), [Gravity Forms](https://gaitcha.com/fr/guides/gravity-forms/) et [Elementor Pro](https://gaitcha.com/fr/guides/elementor-pro/).
 
-Le texte dans la case utilise le libellé traduit de l'extension. L'ancien exemple de libellé personnalisé pour CF7 ne s'applique plus. Dans Gravity Forms, tu peux modifier ou masquer le **libellé du champ** avec ses réglages habituels ; c'est un autre texte que celui de la case.
-
-Teste les formulaires AJAX, popups, champs conditionnels et formulaires à plusieurs pages dans ta configuration réelle. La présence d'un connecteur ne garantit pas la compatibilité avec tous les modules complémentaires ou thèmes.
+Le texte dans la case utilise le libellé traduit de l'extension. Dans Gravity Forms, tu peux modifier ou masquer le **libellé du champ** avec ses réglages habituels ; c'est un autre texte que celui de la case.
 
 ## Formulaires natifs WordPress
 
@@ -55,7 +47,7 @@ Dans **Réglages → Gaitcha**, tu peux activer séparément :
 - Le mot de passe oublié
 - Les commentaires
 
-Les quatre sont désactivés par défaut. Ces intégrations ciblent les formulaires natifs WordPress. Les pages de connexion personnalisées, extensions d'espace membre et paiements WooCommerce demandent des vérifications de compatibilité séparées.
+Les quatre sont désactivés par défaut et concernent les formulaires natifs WordPress. Le paiement WooCommerce et les formulaires d'espace membre personnalisés ne font pas partie de ces intégrations.
 
 ## Apparence
 
@@ -74,47 +66,101 @@ Le thème et le style s'appliquent à tous les connecteurs. Ils ne changent pas 
 4. Le journal d'interaction est capturé quand la case est cochée.
 5. L'envoi transmet les champs de vérification à WordPress, où le core contrôle le jeton et évalue le journal.
 
-La signature protège le jeton, pas la véracité du journal. Le temps de calcul varie selon l'appareil et la difficulté configurée. La souris, le clavier et le tactile sont pris en charge, ce qui ne suffit pas à établir l'accessibilité pour tous les utilisateurs et formulaires.
+Le widget prend en charge la souris, le clavier et le tactile. La preuve de travail se calcule en arrière-plan ; sa durée dépend de l'appareil du visiteur et de la difficulté configurée.
 
 ## Données et mises à jour
 
 Les données d'interaction transitent du navigateur du visiteur vers ton serveur WordPress. Elles ne sont pas envoyées à un fournisseur de vérification captcha. Le client fourni ne pose pas de cookies de suivi, ne charge pas de pixels publicitaires et ne crée pas d'empreinte persistante du visiteur.
 
-L'anti-rejeu conserve temporairement l'état des jetons et challenges dans `wp_options`. Ton hébergeur et d'autres extensions peuvent garder leurs propres logs. Décris le traitement utilisé sur ton site ; installer Gaitcha ne règle pas toutes tes obligations concernant les données personnelles. [Parcours des données et confidentialité](https://gaitcha.com/fr/privacy/).
+L'anti-rejeu conserve temporairement l'état des jetons et challenges dans `wp_options`. Ton hébergeur et d'autres extensions peuvent garder leurs propres logs. [Parcours des données et confidentialité](https://gaitcha.com/fr/privacy/).
 
 L'extension consulte **GitHub Releases** et intègre les nouvelles versions à l'écran de mises à jour WordPress. Ces requêtes contactent GitHub et sont distinctes de la vérification captcha.
 
 ## Hooks pour les développeurs
 
-### Configurer la vérification
+L'extension expose deux filtres : `gaitcha_config` pour les réglages de vérification et `gaitcha_bypass_admin` pour l'exemption des administrateurs.
 
-Utilise `gaitcha_config` pour modifier les options du core. Place ton filtre dans une extension de site ou un mu-plugin :
+### `gaitcha_config`
+
+Filtre le tableau de configuration avant l'initialisation du core. Enregistre-le dans une extension de site ou un mu-plugin : Gaitcha le lit sur `plugins_loaded`, avant le chargement du `functions.php` du thème. Le filtre reçoit un tableau et doit retourner le tableau modifié.
+
+Par exemple, pour augmenter le seuil de score et raccourcir la durée de validité des jetons :
 
 ```php
 /**
- * Ajuste la durée de validité du jeton pour ce site.
+ * Augmente le seuil de score et raccourcit la validité des jetons.
  *
  * @param array $config Configuration Gaitcha.
  * @return array
  */
 function mysite_gaitcha_config( array $config ): array {
-    $config['ttl'] = 120;
+    $config['score_threshold'] = 0.6;
+    $config['ttl']             = 60;
     return $config;
 }
 add_filter( 'gaitcha_config', 'mysite_gaitcha_config' );
 ```
 
-Les autres options incluent `score_threshold` (`0.5` par défaut), `pow` (`true` dans l'extension), `pow_difficulty` (`18`), `pow_challenge_ttl` (`90` secondes), `anti_replay` (`true`), `token_store`, `debug` et `no_js_fallback` (`'reject'`). Voir la [configuration du core](https://github.com/willybahuaud/gaitcha/blob/main/README.fr.md#preuve-de-travail-et-configuration).
+Un seuil plus élevé demande un meilleur score comportemental et peut rejeter davantage de soumissions. Teste le changement sur tes formulaires avant de le déployer.
 
-Augmenter le seuil peut rejeter davantage de soumissions légitimes. Augmenter la difficulté PoW impose aussi plus de calcul aux visiteurs. Teste les deux avant de changer les réglages en production.
+#### Preuve de travail
 
-`no_js_fallback: 'allow'` ignore la vérification quand le jeton manque. Il ne distingue pas un visiteur qui a désactivé JavaScript d'un script qui soumet directement des données.
+La preuve de travail est active par défaut. Tu peux ajuster sa difficulté indépendamment du score comportemental :
 
-### Inclure les administrateurs dans les contrôles
+```php
+/**
+ * Augmente le calcul demandé pour obtenir un jeton.
+ *
+ * @param array $config Configuration Gaitcha.
+ * @return array
+ */
+function mysite_gaitcha_pow( array $config ): array {
+    $config['pow_difficulty'] = 20;
+    return $config;
+}
+add_filter( 'gaitcha_config', 'mysite_gaitcha_pow' );
+```
+
+Chaque bit supplémentaire double le calcul attendu : `20` demande environ quatre fois le travail du réglage par défaut `18`. Teste les appareils lents avant de l'augmenter. Pour désactiver la preuve de travail, utilise `$config['pow'] = false;` dans le filtre ; le score comportemental reste actif.
+
+#### Référence des options
+
+Voici les **valeurs par défaut de l'extension WordPress**, y compris celles héritées du core :
+
+| Option | Valeur par défaut | Rôle |
+|---|---|---|
+| `secret` | Généré à l'activation | Secret de signature côté serveur, au moins 32 caractères |
+| `ttl` | `120` | Durée de validité du jeton en secondes |
+| `score_threshold` | `0.5` | Score comportemental minimum accepté, entre 0 et 1 |
+| `debug` | Valeur de `WP_DEBUG`, ou `false` | Ajouter le détail du score aux résultats de validation |
+| `no_js_fallback` | `'reject'` | Rejeter les envois sans jeton ; `'allow'` les accepte sans vérification |
+| `anti_replay` | `true` | Contrôler les jetons et challenges déjà utilisés |
+| `token_store` | `GaitchaWP\WPTokenStore` si l'anti-rejeu est actif | État temporaire dans les options WordPress ; accepte une implémentation de `Gaitcha\TokenStoreInterface` |
+| `pow` | `true` | Exiger une preuve de travail avant de délivrer un jeton |
+| `pow_difficulty` | `18` | Nombre de bits à zéro demandés, de 8 à 26 |
+| `pow_challenge_ttl` | `90` | Durée de validité du challenge en secondes, minimum 10 |
+
+`no_js_fallback: 'allow'` accepte aussi les soumissions automatisées sans jeton. Garde `'reject'` si chaque envoi doit passer la vérification.
+
+La [référence du core](https://github.com/willybahuaud/gaitcha/blob/main/README.fr.md#preuve-de-travail-et-configuration) documente aussi les noms des champs. Modifie le tableau existant plutôt que de le remplacer, pour conserver le secret généré et les réglages de l'extension.
+
+### `gaitcha_bypass_admin`
+
+Filtre l'exemption de vérification. Sa valeur par défaut est `current_user_can( 'manage_options' )` : les administrateurs sont dispensés du captcha pour travailler sur les formulaires sans le remplir à chaque essai. Le filtre reçoit et retourne un booléen.
+
+Pour soumettre aussi les administrateurs à la vérification :
 
 ```php
 add_filter( 'gaitcha_bypass_admin', '__return_false' );
 ```
+
+C'est utile pour tester le formulaire en restant connecté. Place ce filtre dans la même extension de site ou le même mu-plugin que tes autres réglages Gaitcha.
+
+## Limites
+
+Les données d'interaction côté client peuvent être fabriquées : une automatisation conçue pour Gaitcha peut donc passer la vérification. La preuve de travail ajoute un coût de calcul ; elle ne prouve pas que le visiteur est humain. Conserve la limitation de débit, la validation des champs et les protections de connexion de ton site.
+
+Avant la mise en ligne, teste tes formulaires au clavier, sur mobile et avec les technologies d'assistance, y compris une nouvelle tentative après un rejet. Pour les formulaires AJAX, les popups ou les formulaires à plusieurs pages, teste le parcours d'envoi complet.
 
 ## Dépannage et développement
 

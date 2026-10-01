@@ -12,17 +12,13 @@ A self-hosted captcha for WordPress forms. Checks interaction data on your serve
 
 == Description ==
 
-Gaitcha adds a checkbox to your forms. It collects mouse, keyboard or touch interaction data, then checks a signed token and scores the log on your WordPress server. You do not need a captcha service account or API key.
+Gaitcha adds a captcha checkbox to your forms, with verification on your own WordPress server. Visitors check a box instead of solving image puzzles. You install the plugin and add a field to your form, without creating a captcha service account or getting an API key.
+
+The plugin evaluates mouse, keyboard and touch interactions and uses proof of work to add a computational cost to token requests.
 
 Website and demo: https://gaitcha.com/
 WordPress documentation: https://gaitcha.com/wordpress/
 Documentation en français : https://gaitcha.com/fr/wordpress/
-
-= What the check means =
-
-The interaction log comes from the client and can be fabricated. A script can request a token, solve the required computation and submit a plausible log without running a browser. The signature protects the token; it does not prove that the reported gestures happened.
-
-Proof of work adds a computational cost. It does not establish that a visitor is human. There is no published detection rate for Gaitcha. Keep rate limiting, normal field validation and login protections. Test with your users' input methods and allow a retry after rejection.
 
 = Supported forms =
 
@@ -37,7 +33,7 @@ Proof of work adds a computational cost. It does not establish that a visitor is
 
 Connectors load when the corresponding form plugin is active. Add the Gaitcha field in the builder. In Contact Form 7, insert [gaitcha] before the submit button.
 
-The plugin also supports native WordPress login, registration, lost-password and comment forms. Enable each separately under Settings > Gaitcha. All four are off by default. Custom login pages, membership plugins and WooCommerce checkout require separate compatibility checks.
+The plugin also supports native WordPress login, registration, lost-password and comment forms. Enable each separately under Settings > Gaitcha. All four are off by default and apply to native WordPress forms. WooCommerce checkout and custom membership forms are outside these integrations.
 
 = Appearance =
 
@@ -49,7 +45,7 @@ The text inside the checkbox uses the plugin's translated default. Gravity Forms
 
 Interaction data travels from the visitor's browser to your WordPress server. The plugin does not send that log to a third-party captcha verification service. The bundled client does not set tracking cookies, load advertising pixels or create a persistent visitor fingerprint.
 
-Proof of work and anti-replay are enabled by default. Temporary token and challenge state is kept in WordPress options. Hosting and application logs are separate; describe the processing used on your site rather than assuming the plugin settles all privacy obligations.
+Proof of work and anti-replay are enabled by default. Temporary token and challenge state is kept in WordPress options. Hosting and application logs are separate.
 
 The plugin contacts GitHub Releases to check for updates. These requests are separate from visitor verification.
 
@@ -72,13 +68,13 @@ No. Captcha verification runs on your WordPress server and requires no third-par
 
 = Does it work without JavaScript? =
 
-JavaScript is required by default. Setting no_js_fallback to 'allow' through the gaitcha_config filter bypasses verification when a token is absent. This also permits direct automated submissions without a token; the option cannot tell why the token is missing.
+JavaScript is required by default. Setting no_js_fallback to 'allow' through gaitcha_config accepts submissions without a token, including automated submissions. Keep 'reject' if every submission must pass verification.
 
 = Can I adjust the settings? =
 
 Use Settings > Gaitcha for appearance and native-form protections. Developers can use gaitcha_config to change the score threshold, token lifetime and proof-of-work settings. Examples: https://gaitcha.com/wordpress/#developer-hooks
 
-The score threshold defaults to 0.5, token lifetime to 120 seconds and proof-of-work difficulty to 18. Raising the threshold can reject more legitimate submissions. Raising the difficulty adds work for visitors too.
+The score threshold defaults to 0.5, token lifetime to 120 seconds and proof-of-work difficulty to 18. Register gaitcha_config in a site plugin or mu-plugin, before Gaitcha initializes on plugins_loaded. The full option reference and examples for tuning or disabling proof of work are in the repository README: https://github.com/willybahuaud/gaitcha-for-wp#developer-hooks
 
 = Can administrators be checked too? =
 
@@ -88,7 +84,11 @@ Yes. Add this filter in a site plugin or mu-plugin:
 
 = Is it accessible? =
 
-The widget supports mouse, keyboard and touch input. Heuristic checks can reject legitimate interactions, so test your forms with assistive technology and your audience's input methods. These features do not establish an accessibility certification.
+The widget supports mouse, keyboard and touch input. Test the complete form with keyboard navigation, mobile devices and assistive technology, including a retry after a rejected submission.
+
+= What are its limits? =
+
+Client-side interaction data can be fabricated, so targeted automation can still pass verification. Proof of work adds computational cost; it does not prove that a visitor is human. Keep rate limiting, field validation and your site's login protections alongside Gaitcha.
 
 = What if the widget does not load or a checked form is rejected? =
 
