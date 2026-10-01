@@ -8,13 +8,18 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A self-hosted captcha for WordPress forms. Checks interaction data on your server, with proof of work enabled by default.
+A free, self-hosted behavioral captcha for WordPress. One checkbox, eight form-builder integrations, no captcha service account.
 
 == Description ==
 
-Gaitcha adds a captcha checkbox to your forms, with verification on your own WordPress server. Visitors check a box instead of solving image puzzles. You install the plugin and add a field to your form, without creating a captcha service account or getting an API key.
+Gaitcha is a free, open-source behavioral captcha that runs on your WordPress server. Your visitors check a single box, without image grids or puzzles. Their interaction data stays between their browser and your site.
 
-The plugin evaluates mouse, keyboard and touch interactions and uses proof of work to add a computational cost to token requests.
+The check looks at how someone reaches and checks the box: mouse trajectories, speed changes, keyboard timing and touch gestures. PHP scores those interactions when the form is submitted. Proof of work runs in the background before a token is issued, adding a computational cost to repeated automated requests. Both are enabled out of the box.
+
+* No captcha service to sign up for. Install the plugin and add a Gaitcha field. There is no API key to obtain or external captcha API to call.
+* No visitor tracking in the widget. It sets no tracking cookies and creates no persistent visitor fingerprint. The interaction log is checked on your own server.
+* Works in your form builder. Eight connectors cover Contact Form 7, Gravity Forms, Elementor Pro Forms and more. You can also enable Gaitcha on native login, registration, lost-password and comment forms.
+* You control the setup. Combine light, dark or automatic themes with a classic or minimal style. Use WordPress filters to adjust scoring, token lifetime and proof of work. The code is available under GPL-2.0-or-later.
 
 Website and demo: https://gaitcha.com/
 WordPress documentation: https://gaitcha.com/wordpress/

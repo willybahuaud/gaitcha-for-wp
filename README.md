@@ -2,11 +2,16 @@
 
 English · [Français](README.fr.md)
 
-Gaitcha adds a captcha checkbox to WordPress forms, with verification on your own server. Visitors check a box instead of solving image puzzles. You install the plugin and add a field to your form, without creating a captcha service account or getting an API key.
+**Gaitcha is a free, open-source behavioral captcha that runs on your WordPress server.** Your visitors check a single box, without image grids or puzzles. Their interaction data stays between their browser and your site.
 
-[Website](https://gaitcha.com/) · [Live demo](https://gaitcha.com/#try-it) · [WordPress guide](https://gaitcha.com/wordpress/) · [Troubleshooting](https://gaitcha.com/guides/troubleshooting/)
+The check looks at how someone reaches and checks the box: mouse trajectories, speed changes, keyboard timing and touch gestures. PHP scores those interactions when the form is submitted. Proof of work runs in the background before a token is issued, adding a computational cost to repeated automated requests. Both are enabled out of the box.
 
-The plugin includes connectors for eight form builders, optional protection for native WordPress forms, and light, dark and minimal appearances. It uses the [Gaitcha PHP library](https://github.com/willybahuaud/gaitcha) for behavioral scoring, with proof of work enabled by default.
+- **No captcha service to sign up for.** Install the plugin and add a Gaitcha field. There is no API key to obtain or external captcha API to call.
+- **No visitor tracking in the widget.** It sets no tracking cookies and creates no persistent visitor fingerprint. The interaction log is checked on your own server.
+- **Works in your form builder.** Eight connectors cover Contact Form 7, Gravity Forms, Elementor Pro Forms and more. You can also enable Gaitcha on native login, registration, lost-password and comment forms.
+- **You control the setup.** Combine light, dark or automatic themes with a classic or minimal style. Use WordPress filters to adjust scoring, token lifetime and proof of work. The code is available under GPL-2.0-or-later.
+
+[Try the live demo](https://gaitcha.com/#try-it) · [WordPress guide](https://gaitcha.com/wordpress/) · [Website](https://gaitcha.com/) · [Troubleshooting](https://gaitcha.com/guides/troubleshooting/)
 
 ## Installation
 
@@ -58,7 +63,7 @@ The settings page provides two independent choices:
 
 Theme and style apply across connectors. They do not change the verification rules. The core injects its widget CSS with `!important`; account for that if you add custom overrides.
 
-## What happens on a form
+## How it works
 
 1. A non-interactive placeholder reserves space for the widget.
 2. Interaction starts a request to `/wp-json/gaitcha/v1/init`.
@@ -66,7 +71,13 @@ Theme and style apply across connectors. They do not change the verification rul
 4. Checking the box captures the interaction log.
 5. Submission sends the verification fields to WordPress, where the core checks the token and scores the log.
 
-The widget supports mouse, keyboard and touch input. Proof-of-work computation runs in the background; its duration depends on the visitor's device and the configured difficulty.
+The scorer uses a profile suited to the input method:
+
+- **Mouse:** trajectory shape, speed changes, direction reversals and click offset
+- **Keyboard:** navigation, key press durations and timing variation
+- **Touch:** movement, tap offset, pressure and contact radius when available
+
+The PHP check verifies the token signature and expiry, then compares the behavioral score with the configured threshold (`0.5` by default). Proof of work adds a computational cost before the token is issued; its duration depends on the device and difficulty. You can adjust both through the [developer hooks](#developer-hooks).
 
 ## Data and updates
 
@@ -172,7 +183,7 @@ From a source checkout, install PHP dependencies with:
 composer install
 ```
 
-The core library comes from Composer. `assets/js/gaitcha.min.js` is a prebuilt bundle from that library. See [CHANGELOG.md](CHANGELOG.md) for version history.
+The [Gaitcha core library](https://github.com/willybahuaud/gaitcha) comes from Composer. `assets/js/gaitcha.min.js` is a prebuilt bundle from that library. See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 For a reproducible issue, include WordPress, PHP and form-plugin versions, the form configuration and the steps to reproduce it. Remove visitor data and secrets before posting to [Issues](https://github.com/willybahuaud/gaitcha-for-wp/issues).
 

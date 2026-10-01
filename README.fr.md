@@ -2,11 +2,16 @@
 
 [English](README.md) · Français
 
-Gaitcha ajoute une case de captcha aux formulaires WordPress, avec une vérification sur ton propre serveur. Le visiteur coche une case plutôt que de résoudre une grille d'images. Tu installes l'extension et tu ajoutes un champ à ton formulaire, sans compte à créer ni clé API à récupérer.
+**Gaitcha est un captcha comportemental gratuit et open source qui tourne sur ton serveur WordPress.** Tes visiteurs cochent une case, sans grille d'images ni puzzle. Leurs données d'interaction restent entre leur navigateur et ton site.
 
-[Site](https://gaitcha.com/fr/) · [Démo](https://gaitcha.com/fr/#try-it) · [Guide WordPress](https://gaitcha.com/fr/wordpress/) · [Dépannage](https://gaitcha.com/fr/guides/troubleshooting/)
+La vérification s'appuie sur la façon d'arriver jusqu'à la case et de la cocher : trajectoires de souris, variations de vitesse, délais au clavier et gestes tactiles. PHP évalue ces interactions à l'envoi du formulaire. Une preuve de travail se calcule en arrière-plan avant l'émission du jeton pour ajouter un coût de calcul aux requêtes automatisées répétées. Les deux sont actifs dès l'installation.
 
-L'extension fournit des connecteurs pour huit constructeurs de formulaires, une protection optionnelle des formulaires natifs WordPress et des réglages d'apparence clairs, sombres ou minimalistes. Elle utilise la [bibliothèque PHP Gaitcha](https://github.com/willybahuaud/gaitcha) pour le score comportemental, avec la preuve de travail active par défaut.
+- **Aucun service captcha auquel s'inscrire.** Tu installes l'extension et tu ajoutes un champ Gaitcha. Tu n'as ni clé API à récupérer ni API captcha externe à appeler.
+- **Aucun suivi des visiteurs dans le widget.** Il ne pose pas de cookies de suivi et ne crée pas d'empreinte persistante. Le journal d'interaction est vérifié sur ton propre serveur.
+- **Tu gardes ton constructeur de formulaires.** Huit connecteurs couvrent Contact Form 7, Gravity Forms, Elementor Pro Forms et d'autres. Tu peux aussi activer Gaitcha sur les formulaires natifs de connexion, d'inscription, de mot de passe oublié et de commentaires.
+- **Tu maîtrises les réglages.** Combine un thème clair, sombre ou automatique avec un style classique ou minimal. Les filtres WordPress permettent d'ajuster le score, la durée des jetons et la preuve de travail. Le code est disponible sous GPL-2.0-or-later.
+
+[Essayer la démo](https://gaitcha.com/fr/#try-it) · [Guide WordPress](https://gaitcha.com/fr/wordpress/) · [Site](https://gaitcha.com/fr/) · [Dépannage](https://gaitcha.com/fr/guides/troubleshooting/)
 
 ## Installation
 
@@ -58,7 +63,7 @@ La page de réglages propose deux choix indépendants :
 
 Le thème et le style s'appliquent à tous les connecteurs. Ils ne changent pas les règles de vérification. Le core injecte son CSS avec `!important` ; tiens-en compte si tu ajoutes tes propres styles.
 
-## Ce qui se passe sur un formulaire
+## Fonctionnement
 
 1. Un emplacement non interactif réserve la place du widget.
 2. Une interaction déclenche une requête vers `/wp-json/gaitcha/v1/init`.
@@ -66,7 +71,13 @@ Le thème et le style s'appliquent à tous les connecteurs. Ils ne changent pas 
 4. Le journal d'interaction est capturé quand la case est cochée.
 5. L'envoi transmet les champs de vérification à WordPress, où le core contrôle le jeton et évalue le journal.
 
-Le widget prend en charge la souris, le clavier et le tactile. La preuve de travail se calcule en arrière-plan ; sa durée dépend de l'appareil du visiteur et de la difficulté configurée.
+Le moteur utilise un profil adapté au mode de saisie :
+
+- **Souris :** forme de la trajectoire, variations de vitesse, changements de direction et décalage du clic
+- **Clavier :** navigation, durée des appuis et variation des délais
+- **Tactile :** mouvement, décalage du toucher, pression et rayon de contact quand ils sont disponibles
+
+Le contrôle PHP vérifie la signature et l'expiration du jeton, puis compare le score comportemental au seuil configuré (`0.5` par défaut). La preuve de travail ajoute un coût de calcul avant l'émission du jeton ; sa durée dépend de l'appareil et de la difficulté. Tu peux régler les deux via les [hooks développeurs](#hooks-pour-les-développeurs).
 
 ## Données et mises à jour
 
@@ -172,7 +183,7 @@ Depuis une copie des sources, installe les dépendances PHP avec :
 composer install
 ```
 
-La bibliothèque core vient de Composer. `assets/js/gaitcha.min.js` est un bundle précompilé de cette bibliothèque. L'historique des versions est dans [CHANGELOG.md](CHANGELOG.md).
+La [bibliothèque Gaitcha](https://github.com/willybahuaud/gaitcha) vient de Composer. `assets/js/gaitcha.min.js` est un bundle précompilé de cette bibliothèque. L'historique des versions est dans [CHANGELOG.md](CHANGELOG.md).
 
 Pour un problème reproductible, indique les versions de WordPress, PHP et de l'extension de formulaires, la configuration du formulaire et les étapes de reproduction. Retire les données des visiteurs et les secrets avant de publier dans les [issues](https://github.com/willybahuaud/gaitcha-for-wp/issues).
 
