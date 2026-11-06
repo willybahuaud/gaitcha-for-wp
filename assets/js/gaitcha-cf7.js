@@ -78,6 +78,24 @@
 	document.addEventListener('wpcf7submit', scanContainers);
 
 	/**
+	 * Initializes containers added after page load (forms injected in a popin, for instance).
+	 *
+	 * @param {MutationRecord[]} mutations Observed DOM changes.
+	 * @return {void}
+	 */
+	function handleDomMutations(mutations) {
+		var hasNewElements = mutations.some(function hasAddedElement(mutation) {
+			return mutation.addedNodes.length > 0;
+		});
+
+		if (hasNewElements) {
+			scanContainers();
+		}
+	}
+
+	new MutationObserver(handleDomMutations).observe(document.body, { childList: true, subtree: true });
+
+	/**
 	 * Resets Gaitcha after a CF7 validation error.
 	 *
 	 * CF7 does not replace the form DOM on validation failures

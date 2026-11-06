@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] — 2026-11-06
+
+### Fixed
+- Contact Form 7: the widget was never initialized on forms injected after page load (popins), which left them blocked.
+
 ## [1.3.1] — 2026-07-16
 
 ### Fixed
