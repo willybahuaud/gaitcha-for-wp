@@ -115,6 +115,39 @@ class GFFieldGaitcha extends \GF_Field {
 	}
 
 	/**
+	 * Returns the HTML tag for the field container.
+	 *
+	 * Like the native Consent and Checkboxes fields, the field is rendered
+	 * as a fieldset so that its label becomes a <legend> naming the group
+	 * that contains the captcha checkbox. A <label for="..."> cannot be used:
+	 * the checkbox is a JS-rendered role="checkbox" element, not a labelable
+	 * input. Legacy markup keeps the parent container.
+	 *
+	 * @param array $form The current Form object.
+	 * @return string
+	 */
+	public function get_field_container_tag( $form ) {
+		if ( \GFCommon::is_legacy_markup_enabled( $form ) ) {
+			return parent::get_field_container_tag( $form );
+		}
+
+		return 'fieldset';
+	}
+
+	/**
+	 * Returns the input ID used by the label "for" attribute.
+	 *
+	 * Empty, like the native Checkboxes field: the container rendered by
+	 * get_field_input() is a div, which a label cannot target.
+	 *
+	 * @param array $form The current Form object.
+	 * @return string
+	 */
+	public function get_first_input_id( $form ) {
+		return '';
+	}
+
+	/**
 	 * Renders the field HTML on the frontend.
 	 *
 	 * Outputs a container matching native GF checkbox markup.
