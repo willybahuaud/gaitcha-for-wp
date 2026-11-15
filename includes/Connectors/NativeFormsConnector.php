@@ -73,7 +73,6 @@ class NativeFormsConnector implements ConnectorInterface {
 		if ( Settings::is_protected( 'protect_comments' ) ) {
 			add_filter( 'comment_form_submit_field', array( $this, 'inject_before_submit' ), 10, 2 );
 			add_filter( 'preprocess_comment', array( $this, 'validate_comment' ) );
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts_frontend' ) );
 		}
 	}
 
@@ -91,11 +90,16 @@ class NativeFormsConnector implements ConnectorInterface {
 	/**
 	 * Injects the Gaitcha container before the comment submit button.
 	 *
+	 * Scripts are enqueued here, when the comment form is actually rendered,
+	 * so they load in the footer only on views that display a comment form.
+	 *
 	 * @param string $submit_field The submit button HTML.
 	 * @param array  $args         Comment form arguments.
 	 * @return string Modified HTML with Gaitcha container prepended.
 	 */
 	public function inject_before_submit( $submit_field, $args ) {
+		$this->do_enqueue();
+
 		$container = '<div class="gaitcha-native-container" data-gaitcha-container="gaitcha-comment" style="margin-bottom:16px;"></div>';
 
 		return $container . $submit_field;
@@ -212,21 +216,6 @@ class NativeFormsConnector implements ConnectorInterface {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$this->do_enqueue();
-	}
-
-	/**
-	 * Enqueues scripts on the frontend for comment forms.
-	 *
-	 * Only enqueues if the current page is singular (has comments).
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts_frontend() {
-		if ( ! is_singular() ) {
-			return;
-		}
-
 		$this->do_enqueue();
 	}
 

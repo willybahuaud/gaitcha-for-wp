@@ -285,5 +285,5 @@ formulaire. Chaque protection est activable individuellement via la page de regl
   pour ne pas reveler si un compte existe
 - Commentaires : `wp_die()` avec back_link (pas d'AJAX sur les commentaires natifs)
 - Enqueue separe : `login_enqueue_scripts` pour wp-login.php,
-  `wp_enqueue_scripts` (conditionne a `is_singular()`) pour les commentaires
+  enqueue au rendu du formulaire (`comment_form_submit_field`, scripts en footer) pour les commentaires
 - Toutes les protections desactivees par defaut
