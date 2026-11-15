@@ -36,6 +36,52 @@
 			theme: config.theme || 'light',
 			style: config.style || 'default'
 		});
+
+		syncFieldState(container);
+	}
+
+	/**
+	 * Mirrors the Gravity Forms field state on the widget for assistive technologies.
+	 *
+	 * GF adds aria-required, aria-invalid and aria-describedby to the inputs it
+	 * renders itself; the Gaitcha checkbox is rendered by JS, so it gets them here.
+	 * The field cannot be submitted without the check, hence aria-required.
+	 *
+	 * @param {HTMLElement} container The gaitcha container rendered by GF.
+	 * @return {void}
+	 */
+	function syncFieldState(container) {
+		var widget = container.querySelector('.gaitcha-widget');
+		var field = container.closest('.gfield');
+		if (!widget || !field) {
+			return;
+		}
+
+		widget.setAttribute('aria-required', 'true');
+
+		var describedBy = [];
+		var description = field.querySelector('.gfield_description:not(.gfield_validation_message)');
+		if (description && description.id) {
+			describedBy.push(description.id);
+		}
+
+		var message = field.querySelector('.gfield_validation_message');
+		var isInvalid = field.classList.contains('gfield_error') && !!message;
+		if (isInvalid && message.id) {
+			describedBy.push(message.id);
+		}
+
+		if (isInvalid) {
+			widget.setAttribute('aria-invalid', 'true');
+		} else {
+			widget.removeAttribute('aria-invalid');
+		}
+
+		if (describedBy.length) {
+			widget.setAttribute('aria-describedby', describedBy.join(' '));
+		} else {
+			widget.removeAttribute('aria-describedby');
+		}
 	}
 
 	/**
