@@ -146,6 +146,33 @@ class GravityFormsConnector implements ConnectorInterface {
 				'style'        => Settings::get_style(),
 			)
 		);
+
+		$this->enqueue_fieldset_reset();
+	}
+
+	/**
+	 * Strips the browser's default fieldset look from the field container.
+	 *
+	 * The field is rendered as a fieldset. Gravity Forms resets fieldsets
+	 * in its own CSS, but that CSS can be disabled: the field would then
+	 * show the browser's border and padding. The selectors are wrapped in
+	 * :where() so that they weigh nothing against the site's own styles.
+	 *
+	 * @return void
+	 */
+	private function enqueue_fieldset_reset() {
+		// gform_enqueue_scripts runs once per form on the page.
+		if ( wp_style_is( 'gaitcha-gravityforms' ) ) {
+			return;
+		}
+
+		wp_register_style( 'gaitcha-gravityforms', false, array(), GAITCHA_WP_VERSION );
+		wp_enqueue_style( 'gaitcha-gravityforms' );
+		wp_add_inline_style(
+			'gaitcha-gravityforms',
+			':where(fieldset.gfield--type-gaitcha) { border: 0; margin: 0; padding: 0; min-width: 0; }'
+			. ' :where(fieldset.gfield--type-gaitcha > legend) { padding: 0; }'
+		);
 	}
 
 	/**
