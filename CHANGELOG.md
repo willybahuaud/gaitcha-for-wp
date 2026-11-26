@@ -2,10 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.3.3] — 2026-11-26
+
+### Changed
+- Gravity Forms: the field is now rendered as a `fieldset` with its label as `legend` (same markup as the native checkbox and consent fields), and the widget exposes its state to assistive technologies (`aria-required`, `aria-invalid`, `aria-describedby` pointing to the description and the validation message) (#4, #5). Forms using the legacy markup are unchanged. Custom CSS targeting `div.gfield--type-gaitcha` must drop the `div`
+- Gravity Forms: a zero-specificity reset removes the browser's default fieldset border and padding on sites that disable the Gravity Forms CSS
+- Core library updated to 0.8.1
 
 ### Fixed
-- Native comment protection: scripts were enqueued on every singular view, including pages with comments closed (e.g. a static front page). They are now enqueued when the comment form is actually rendered (footer), so they load only where a comment form is displayed, including a form rendered for another post.
+- Gravity Forms: every page view requested a token and computed a proof of work before any interaction, because the adapter resets the widget on `gform_post_render`, which also fires on first display. A visitor who touched the form during that computation could leave the widget stuck in its pending state for 30 seconds, ending with "initialization failed" (#6). Fixed in the core library: a reset does nothing until the widget has been activated, and overlapping proof-of-work resolutions no longer cut each other off
+- Native comment protection: scripts were enqueued on every singular view, including pages with comments closed (e.g. a static front page). They are now enqueued when the comment form is actually rendered (footer), so they load only where a comment form is displayed, including a form rendered for another post (#3). A theme that dequeues `gaitcha-native` to run its own initialization (AJAX navigation) must now do so on `wp_footer` with a priority below 20, no longer on `wp_enqueue_scripts`
+- WPForms (AJAX forms): after a server-side refusal the widget stayed checked and was never reset, so every retry sent the same refused data until the page was reloaded. The adapter was printed before jQuery and silently skipped its reset handler; it now declares its jQuery dependency
+- Formidable (AJAX forms): same dead end after a refusal. The reset handler was bound before jQuery was available and read the form as a jQuery object, while Formidable passes a DOM element
+- Formidable (AJAX forms shown again after a successful submission): the widget was missing from the re-rendered form. `frmPageChanged` and `frmFormComplete` are jQuery events, native listeners never received them
+- Contact Form 7: after a successful submission the widget stayed checked with a consumed token, so a second message from the same page was flagged as spam. The widget is now reset on `wpcf7mailsent`
+- WPForms: "translation loading triggered too early" notice (WordPress 6.7+) on every request. With errors displayed, it corrupted REST and AJAX responses of other plugins (WS Form submissions failed with a JSON parse error). The field is now registered on `init`
 
 ## [1.3.2] — 2026-11-06
 

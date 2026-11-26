@@ -171,6 +171,11 @@ Champ disponible dans le groupe "Advanced Fields" du builder.
 - `gform_validation` — Valide via ValidationOrchestrator
 - `gform_post_render` — Event JS pour re-init apres AJAX
 
+### Rendu
+- Conteneur `fieldset` + `legend` (`div`/`li` + `label` en legacy markup), etat ARIA pose par l'adapter JS
+- Reset du fieldset en CSS inline (`gaitcha-gravityforms`), selecteurs en `:where()` (specificite nulle) :
+  ne sert que sur les sites qui desactivent la CSS de GF
+
 ---
 
 ## WPForms
@@ -184,7 +189,8 @@ Champ dans le groupe "Standard Fields" du builder.
 Tout element positionne doit utiliser `!important`.
 
 ### Hooks WPForms utilises
-- `wpforms_frontend_js` — Enqueue conditionnel
+- `init` — Instancie le field type (pas avant : son `init()` traduit des chaines)
+- `wpforms_frontend_js` — Enqueue conditionnel (adapter JS dependant de `jquery`)
 - `wpforms_process_validate_field` — Valide via ValidationOrchestrator
 
 ---
@@ -212,6 +218,10 @@ Extension de `FrmFieldType` (classe `FrmFieldGaitcha`).
 - `frm_get_field_type_class` — Mappe le type vers la classe
 - `frm_validate_gaitcha_field_entry` — Valide via ValidationOrchestrator
 - `wp_enqueue_scripts` — Enqueue global (pas de hook conditionnel disponible)
+
+### Events JS Formidable
+- `frmFormErrors`, `frmPageChanged`, `frmFormComplete` — Events **jQuery** (un `addEventListener` natif ne les recoit pas), le formulaire est passe en element DOM
+- L'adapter est charge sans dependance jQuery (enqueue global) : il branche ces events au `DOMContentLoaded`
 
 ---
 
