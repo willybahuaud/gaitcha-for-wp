@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Native comment protection: scripts were enqueued on every singular view, including pages with comments closed (e.g. a static front page). They are now enqueued when the comment form is actually rendered (footer), so they load only where a comment form is displayed, including a form rendered for another post.
+
 ## [1.3.2] — 2026-11-06
 
 ### Fixed
