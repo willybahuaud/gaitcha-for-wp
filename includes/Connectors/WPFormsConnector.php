@@ -58,7 +58,7 @@ class WPFormsConnector implements ConnectorInterface {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		$this->register_field_type();
+		add_action( 'init', array( $this, 'register_field_type' ) );
 		add_action( 'wpforms_frontend_js', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wpforms_process_validate_' . self::FIELD_TYPE, array( $this, 'validate_field' ), 10, 3 );
 	}
@@ -66,9 +66,13 @@ class WPFormsConnector implements ConnectorInterface {
 	/**
 	 * Registers the WPForms field class.
 	 *
+	 * Hooked on init, like WPForms does for its own fields: the field
+	 * translates its strings as soon as it is instantiated, which is
+	 * too early on plugins_loaded.
+	 *
 	 * @return void
 	 */
-	private function register_field_type() {
+	public function register_field_type() {
 		if ( class_exists( 'WPForms_Field' ) ) {
 			new WPFormsFieldGaitcha();
 		}
@@ -96,7 +100,7 @@ class WPFormsConnector implements ConnectorInterface {
 		wp_enqueue_script(
 			'gaitcha-wpforms',
 			GAITCHA_WP_URL . 'assets/js/gaitcha-wpforms.js',
-			array( 'gaitcha' ),
+			array( 'gaitcha', 'jquery' ),
 			GAITCHA_WP_VERSION,
 			true
 		);
