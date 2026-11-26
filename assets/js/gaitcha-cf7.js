@@ -96,17 +96,18 @@
 	new MutationObserver(handleDomMutations).observe(document.body, { childList: true, subtree: true });
 
 	/**
-	 * Resets Gaitcha after a CF7 validation error.
+	 * Resets Gaitcha once CF7 has answered a submission.
 	 *
-	 * CF7 does not replace the form DOM on validation failures
-	 * (wpcf7invalid, wpcf7spam, wpcf7mailfailed). The checkbox
-	 * stays checked with stale behavioral data and a potentially
-	 * consumed token — the user can't retry without a reset.
+	 * CF7 never replaces the form DOM. After a failure (wpcf7invalid,
+	 * wpcf7spam, wpcf7mailfailed) the checkbox stays checked with stale
+	 * behavioral data — the user can't retry without a reset. After a
+	 * success (wpcf7mailsent) it stays checked with a consumed token:
+	 * a second message from the same page would be flagged as spam.
 	 *
 	 * @param {Event} event CF7 custom event on the form (6.x) or wrapper div (5.x).
 	 * @return {void}
 	 */
-	function handleValidationError(event) {
+	function handleSubmissionResult(event) {
 		var target = event.target;
 		var form = target.tagName === 'FORM'
 			? target
@@ -117,8 +118,9 @@
 		}
 	}
 
-	// Reset after validation errors — form stays in DOM, needs fresh captcha.
-	document.addEventListener('wpcf7invalid', handleValidationError);
-	document.addEventListener('wpcf7spam', handleValidationError);
-	document.addEventListener('wpcf7mailfailed', handleValidationError);
+	// Reset after each answer — form stays in DOM, needs fresh captcha.
+	document.addEventListener('wpcf7invalid', handleSubmissionResult);
+	document.addEventListener('wpcf7spam', handleSubmissionResult);
+	document.addEventListener('wpcf7mailfailed', handleSubmissionResult);
+	document.addEventListener('wpcf7mailsent', handleSubmissionResult);
 })();
