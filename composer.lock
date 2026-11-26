@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "willybahuaud/gaitcha",
-            "version": "v0.8.0",
+            "version": "v0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/willybahuaud/gaitcha.git",
-                "reference": "0961f769cc1d89bcdf7610d2d721d10fdbebd2e8"
+                "reference": "4da485ec84c441b18184e8d702dfc23ba510e57d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willybahuaud/gaitcha/zipball/0961f769cc1d89bcdf7610d2d721d10fdbebd2e8",
-                "reference": "0961f769cc1d89bcdf7610d2d721d10fdbebd2e8",
+                "url": "https://api.github.com/repos/willybahuaud/gaitcha/zipball/4da485ec84c441b18184e8d702dfc23ba510e57d",
+                "reference": "4da485ec84c441b18184e8d702dfc23ba510e57d",
                 "shasum": ""
             },
             "require": {
@@ -46,9 +46,9 @@
             "description": "Frictionless, self-hosted CAPTCHA combining behavioral analysis, random field names, and HMAC tokens.",
             "support": {
                 "issues": "https://github.com/willybahuaud/gaitcha/issues",
-                "source": "https://github.com/willybahuaud/gaitcha/tree/v0.8.0"
+                "source": "https://github.com/willybahuaud/gaitcha/tree/v0.8.1"
             },
-            "time": "2026-06-10T21:24:15+00:00"
+            "time": "2026-11-26T00:27:06+00:00"
         }
     ],
     "packages-dev": [],

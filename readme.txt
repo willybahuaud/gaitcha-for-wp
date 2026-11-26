@@ -3,7 +3,7 @@ Contributors: willybahuaud
 Tags: captcha, spam, security, forms, antispam
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.3.1
+Stable tag: 1.3.3
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -107,6 +107,19 @@ Check the JavaScript assets, /wp-json/gaitcha/v1/init, cache exclusions, token e
 
 == Changelog ==
 
+= 1.3.3 =
+* Gravity Forms: no more token request on page load, and the widget no longer gets stuck when the form is touched right after display
+* Gravity Forms: the field label is tied to the checkbox (fieldset and legend) and the error state is exposed to assistive technologies
+* WPForms, Formidable: the widget is reset after a refused AJAX submission, so the visitor can try again
+* Formidable: the widget is back on AJAX forms shown again after a submission
+* Contact Form 7: a second message can be sent from the same page
+* Comments: scripts load only where a comment form is displayed
+* WPForms: fixed the "translation loading triggered too early" notice
+* Core dependency updated to 0.8.1
+
+= 1.3.2 =
+* Contact Form 7: the widget is initialized on forms injected after page load (popins)
+
 = 1.3.1 =
 * Gravity Forms: editable field label and native Field Label Visibility setting
 
@@ -139,5 +152,5 @@ The full version history is in CHANGELOG.md in the source repository.
 
 == Upgrade Notice ==
 
-= 1.3.1 =
-Gravity Forms field-label settings. Use the packaged release ZIP, which includes the core dependency.
+= 1.3.3 =
+Fixes for Gravity Forms, WPForms, Formidable, Contact Form 7 and comments. The Gravity Forms field is now a fieldset: CSS targeting div.gfield--type-gaitcha must drop the div. Use the packaged release ZIP, which includes the core dependency.
